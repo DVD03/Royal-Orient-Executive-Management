@@ -12,7 +12,9 @@ import {
   FaDollarSign,
   FaTags,
   FaFilter,
-  FaLayerGroup
+  FaLayerGroup,
+  FaImage,
+  FaCloudUploadAlt
 } from "react-icons/fa";
 import "../styles/PremiumUI.css";
 
@@ -27,14 +29,11 @@ const MenuManagement = () => {
     minimumQty: 5,
     imageUrl: ""
   });
-  const [editingMenu, setEditingMenu] = useState(null);
-  const [editData, setEditData] = useState({ ...newMenu });
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [image, setImage] = useState(null);
 
   const symbol = localStorage.getItem("currencySymbol") || "$";
 
@@ -50,7 +49,7 @@ const MenuManagement = () => {
       });
       setMenus(res.data || []);
     } catch (err) {
-      toast.error("Failed to load menus");
+      toast.error("Cloud catalog sync failed");
     }
   };
 
@@ -77,132 +76,129 @@ const MenuManagement = () => {
       setMenus([...menus, res.data]);
       setShowAddModal(false);
       resetForm();
-      toast.success("Menu item added!");
+      toast.success("Culinary item registered successfully");
     } catch (err) {
-      toast.error("Failed to add menu item");
+      toast.error("Asset registration failed");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this item?")) return;
+    if (!window.confirm("Purge this item from catalog?")) return;
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/menu/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMenus(menus.filter((m) => m._id !== id));
-      toast.success("Item deleted");
+      toast.success("Asset purged");
     } catch (err) {
-      toast.error("Failed to delete");
+      toast.error("Operation failed");
     }
   };
 
   const resetForm = () => {
     setNewMenu({ name: "", description: "", price: "0", cost: "0", category: "Main Course", minimumQty: 5, imageUrl: "" });
     setImage(null);
-    setPreview("");
   };
 
   return (
-    <div className="menu-management-container animate-fade-in">
-      <ToastContainer theme="dark" />
+    <div className="menu-management-container animate-in p-2">
+      <ToastContainer theme="light" />
       
-      {/* Header */}
+      {/* Platinum Header */}
       <div className="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-4">
         <div>
-          <h1 className="premium-title mb-1">Culinaries & Menu</h1>
-          <p className="premium-subtitle mb-0">Manage your restaurant offerings and stock levels</p>
+          <h1 className="premium-title">Culinary Catalog</h1>
+          <p className="premium-subtitle">Manage high-quality menu assets and inventory thresholds</p>
         </div>
-        <button className="btn-premium btn-premium-secondary px-4 py-3" onClick={() => setShowAddModal(true)}>
-          <FaPlus /> Add New Creation
+        <button className="btn-premium btn-primary px-4 py-3 rounded-pill shadow-lg" onClick={() => setShowAddModal(true)}>
+          <FaPlus /> Authorize New Creation
         </button>
       </div>
 
-      {/* Stats Quick Look */}
+      {/* Stats Widgets */}
       <div className="row g-4 mb-5">
         <div className="col-md-3">
-            <div className="orient-card orient-stat-card py-3">
-                <div className="orient-stat-icon bg-blue-glow"><FaUtensils size={20} /></div>
+            <div className="orient-card stat-widget py-3 border-0 shadow-sm">
+                <div className="stat-icon bg-blue-glow"><FaUtensils size={20} /></div>
                 <div>
-                    <div className="orient-stat-label">Total Items</div>
-                    <div className="orient-stat-value" style={{ fontSize: '1.4rem' }}>{menus.length}</div>
+                    <div className="stat-label">Aggregated Items</div>
+                    <div className="stat-value">{menus.length}</div>
                 </div>
             </div>
         </div>
         <div className="col-md-3">
-            <div className="orient-card orient-stat-card py-3">
-                <div className="orient-stat-icon bg-gold-glow"><FaLayerGroup size={20} /></div>
+            <div className="orient-card stat-widget py-3 border-0 shadow-sm">
+                <div className="stat-icon bg-gold-glow"><FaLayerGroup size={20} /></div>
                 <div>
-                    <div className="orient-stat-label">Categories</div>
-                    <div className="orient-stat-value" style={{ fontSize: '1.4rem' }}>{allCategories.length}</div>
+                    <div className="stat-label">Departments</div>
+                    <div className="stat-value">{allCategories.length}</div>
                 </div>
             </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="premium-card mb-5 p-4">
-        <div className="row g-4 align-items-center">
+      {/* Search & Filter Bar */}
+      <div className="orient-card mb-5 p-3 border-0 shadow-sm bg-white">
+        <div className="row g-3 align-items-center">
             <div className="col-md-6">
                 <div className="position-relative">
-                    <FaSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
+                    <FaSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" size={12} />
                     <input 
                         type="text" 
-                        className="premium-input ps-5" 
-                        placeholder="Search for a dish..." 
+                        className="premium-input ps-5 bg-app border-0" 
+                        placeholder="Search culinary registry..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
             </div>
-            <div className="col-md-6 d-flex gap-3">
-                <div className="flex-grow-1 position-relative">
-                    <FaFilter className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
-                    <select 
-                        className="premium-input premium-select ps-5"
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                        <option value="">All Collections</option>
-                        {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                    </select>
-                </div>
+            <div className="col-md-6">
+                <select 
+                    className="premium-input bg-app border-0 fw-800"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                    <option value="">All Collections</option>
+                    {allCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                </select>
             </div>
         </div>
       </div>
 
-      {/* Menu Grid */}
+      {/* Catalog Grid */}
       <div className="row g-4">
         {filteredMenus.map((menu) => (
           <div className="col-xl-3 col-lg-4 col-md-6" key={menu._id}>
-            <div className="orient-card p-0 overflow-hidden h-100 d-flex flex-column">
-              <div className="menu-image-wrap">
+            <div className="orient-card p-0 overflow-hidden h-100 d-flex flex-column border-0 shadow-platinum bg-white">
+              <div className="catalog-img-box">
                 {menu.imageUrl ? (
-                    <img src={menu.imageUrl} alt={menu.name} className="w-100 h-100 object-fit-cover" />
+                    <img src={menu.imageUrl} alt={menu.name} />
                 ) : (
-                    <FaUtensils size={40} className="text-muted opacity-20" />
+                    <div className="img-placeholder"><FaUtensils size={32} /></div>
                 )}
-                <div className="category-badge">{menu.category}</div>
+                <div className="price-tag">{symbol}{menu.price}</div>
               </div>
               <div className="p-4 flex-grow-1 d-flex flex-column">
-                <h5 className="text-white mb-2 fw-bold">{menu.name}</h5>
-                <p className="orient-text-muted small mb-3 flex-grow-1">{menu.description || "No description provided for this culinary creation."}</p>
+                <div className="tiny text-primary fw-900 text-uppercase mb-1">{menu.category}</div>
+                <h6 className="text-main fw-900 mb-2">{menu.name}</h6>
+                <p className="text-muted tiny mb-4 flex-grow-1">{menu.description || "System generated description pending."}</p>
                 
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div className="price-tag text-gold fw-bold fs-5">{symbol}{menu.price}</div>
-                    <div className={`badge-premium ${menu.currentQty > 5 ? 'badge-success' : 'badge-danger'}`}>
-                        {menu.currentQty} In Stock
-                    </div>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <span className={`badge ${menu.currentQty > 5 ? 'badge-green' : 'badge-red'}`}>
+                        {menu.currentQty} IN STOCK
+                    </span>
+                    <span className="tiny fw-700 text-muted">COST: {symbol}{menu.cost}</span>
                 </div>
 
                 <div className="d-flex gap-2">
-                    <button className="btn-premium btn-premium-accent flex-grow-1 py-2" style={{ fontSize: '0.8rem' }} onClick={() => {}}>
-                        <FaEdit /> Edit
+                    <button className="btn-premium btn-ghost flex-grow-1 py-2 text-primary rounded-3">
+                        <FaEdit size={12} /> Manage
                     </button>
-                    <button className="btn-premium btn-premium-primary py-2" onClick={() => handleDelete(menu._id)}>
-                        <FaTrash />
+                    <button className="btn-premium btn-ghost py-2 text-danger rounded-3" onClick={() => handleDelete(menu._id)}>
+                        <FaTrash size={12} />
                     </button>
                 </div>
               </div>
@@ -211,37 +207,42 @@ const MenuManagement = () => {
         ))}
       </div>
 
-      {/* Add Modal */}
+      {/* Modern Modal */}
       {showAddModal && (
-        <div className="premium-modal-overlay animate-fade-in">
-            <div className="premium-modal">
-                <h3 className="premium-title mb-4">New Creation</h3>
-                <form onSubmit={handleCreate} className="row g-3">
+        <div className="modal-root animate-in">
+            <div className="modal-glass" onClick={() => setShowAddModal(false)}></div>
+            <div className="orient-card p-5 bg-white shadow-platinum border-0 modal-content-centered">
+                <div className="d-flex justify-content-between align-items-center mb-5">
+                    <h3 className="fw-900 text-main mb-0">Culinary Onboarding</h3>
+                    <button className="btn-premium btn-ghost p-2 rounded-circle" onClick={() => setShowAddModal(false)}><FaWindowClose /></button>
+                </div>
+                
+                <form onSubmit={handleCreate} className="row g-4">
                     <div className="col-12">
-                        <label className="orient-stat-label">Item Name</label>
-                        <input type="text" className="premium-input" required value={newMenu.name} onChange={(e) => setNewMenu({...newMenu, name: e.target.value})} />
+                        <label className="stat-label mb-2 d-block">Dish Nomenclature</label>
+                        <input type="text" className="premium-input bg-app border-0" required value={newMenu.name} onChange={(e) => setNewMenu({...newMenu, name: e.target.value})} />
                     </div>
                     <div className="col-md-6">
-                        <label className="orient-stat-label">Price ({symbol})</label>
-                        <input type="number" className="premium-input" required value={newMenu.price} onChange={(e) => setNewMenu({...newMenu, price: e.target.value})} />
+                        <label className="stat-label mb-2 d-block">Retail Price ({symbol})</label>
+                        <input type="number" className="premium-input bg-app border-0" required value={newMenu.price} onChange={(e) => setNewMenu({...newMenu, price: e.target.value})} />
                     </div>
                     <div className="col-md-6">
-                        <label className="orient-stat-label">Cost ({symbol})</label>
-                        <input type="number" className="premium-input" value={newMenu.cost} onChange={(e) => setNewMenu({...newMenu, cost: e.target.value})} />
+                        <label className="stat-label mb-2 d-block">Base Cost ({symbol})</label>
+                        <input type="number" className="premium-input bg-app border-0" value={newMenu.cost} onChange={(e) => setNewMenu({...newMenu, cost: e.target.value})} />
                     </div>
                     <div className="col-12">
-                        <label className="orient-stat-label">Category</label>
-                        <input type="text" className="premium-input" value={newMenu.category} onChange={(e) => setNewMenu({...newMenu, category: e.target.value})} />
+                        <label className="stat-label mb-2 d-block">Department / Category</label>
+                        <input type="text" className="premium-input bg-app border-0" value={newMenu.category} onChange={(e) => setNewMenu({...newMenu, category: e.target.value})} />
                     </div>
                     <div className="col-12">
-                        <label className="orient-stat-label">Description</label>
-                        <textarea className="premium-input" rows="3" value={newMenu.description} onChange={(e) => setNewMenu({...newMenu, description: e.target.value})}></textarea>
+                        <label className="stat-label mb-2 d-block">Catalog Description</label>
+                        <textarea className="premium-input bg-app border-0" rows="3" value={newMenu.description} onChange={(e) => setNewMenu({...newMenu, description: e.target.value})}></textarea>
                     </div>
-                    <div className="col-12 d-flex gap-3 mt-4">
-                        <button type="submit" className="btn-premium btn-premium-secondary flex-grow-1" disabled={loading}>
-                            {loading ? "Creating..." : "Save Creation"}
+                    
+                    <div className="col-12 mt-5">
+                        <button type="submit" className="btn-premium btn-primary w-100 py-3 rounded-pill" disabled={loading}>
+                            {loading ? "Authorizing Asset..." : "Commit Creation to Catalog"}
                         </button>
-                        <button type="button" className="btn-premium btn-premium-primary" onClick={() => setShowAddModal(false)}>Cancel</button>
                     </div>
                 </form>
             </div>
@@ -249,8 +250,10 @@ const MenuManagement = () => {
       )}
 
       <style>{`
-        .menu-image-wrap { height: 180px; position: relative; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
-        .category-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--orient-gold); }
+        .modal-root { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-glass { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); }
+        .modal-content-centered { position: relative; z-index: 10; width: 100%; max-width: 540px; }
+        .tiny { font-size: 0.7rem; }
       `}</style>
     </div>
   );
