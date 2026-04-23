@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FaUserCircle, FaUnlockAlt, FaArrowRight } from "react-icons/fa";
 import { AuthContext } from "../context/auth-context";
+import API_BASE_URL from "../apiConfig";
 import "./Login.css";
 
 const CashierLogin = () => {
@@ -17,7 +18,7 @@ const CashierLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/login", { email, password });
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
       const data = res.data;
 
       if (data.role !== "cashier") {
@@ -35,79 +36,54 @@ const CashierLogin = () => {
   };
 
   return (
-    <div className="login-wrapper">
-      <div className="login-bg-overlay"></div>
+    <div className="auth-page-luxury">
+      <div className="auth-split-left">
+        <div className="auth-card-premium">
+          <h2 className="auth-title-premium">Cashier Portal</h2>
+          <p className="auth-subtitle-premium">Retail Management Interface</p>
 
-      <div className="login-glass-card">
-        <h2 className="login-card-title">Cashier Portal</h2>
-        <span className="login-card-subtitle">Retail Management Interface</span>
-
-        <form onSubmit={handleLogin}>
-          <div className="login-input-group">
-            <label htmlFor="email">Cashier Identity</label>
-            <div className="login-input-wrapper">
-              <FaUserCircle className="login-input-icon" />
+          <form onSubmit={handleLogin} className="d-flex flex-column gap-3">
+            <div className="auth-input-group">
+              <label>Personnel Identity</label>
               <input
                 type="email"
-                className="login-input-premium"
-                id="email"
-                placeholder="Enter email"
+                className="auth-input-premium"
+                placeholder="Cashier Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={loading}
               />
             </div>
-          </div>
 
-          <div className="login-input-group">
-            <label htmlFor="password">Security Pin</label>
-            <div className="login-input-wrapper">
-              <FaUnlockAlt className="login-input-icon" />
+            <div className="auth-input-group">
+              <label>Security Pin</label>
               <input
                 type="password"
-                className="login-input-premium"
-                id="password"
-                placeholder="Enter password"
+                className="auth-input-premium"
+                placeholder="Security Pin"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={loading}
               />
             </div>
+
+            <button type="submit" className="auth-btn-primary mt-3" disabled={loading}>
+              {loading ? "AUTHENTICATING..." : "ACCESS REGISTER"}
+            </button>
+          </form>
+
+          <div className="auth-footer">
+             <Link to="/forgot-password" inclassName="auth-link-gold small d-block mb-2">Reset Password</Link>
+             <Link to="/" className="auth-link-gold small">Return to Home</Link>
           </div>
-
-          <button
-            type="submit"
-            className="login-btn-premium btn-cashier-accent"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Authenticating...
-              </>
-            ) : (
-              <>
-                Access Register <FaArrowRight />
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p>
-            Need help?{" "}
-            <Link to="/forgot-password" inclassName="link-gold">
-              Reset Password
-            </Link>
-          </p>
-          <p style={{ marginTop: "10px" }}>
-            <Link to="/" className="link-gold">
-              Return to Home
-            </Link>
-          </p>
         </div>
+      </div>
+
+      <div className="auth-split-right">
+          <div className="text-center animate-in">
+              <div className="display-4 fw-900 text-white opacity-20">REGISTER</div>
+              <div className="h6 text-white tracking-widest mt-2">TERMINAL ACCESS</div>
+          </div>
       </div>
     </div>
   );

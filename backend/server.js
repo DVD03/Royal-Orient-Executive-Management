@@ -2,28 +2,38 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const connectDB = require("./config/db"); // Import db.js
-const authRoute = require("./routes/authRoute");
 const path = require("path");
-const app = express();
-// Serve static uploads folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Load env first
 dotenv.config();
 
+const connectDB = require("./config/db");
+const authRoute = require("./routes/authRoute");
 
+const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(cors());
+
+// Serve static uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connect to DB
 connectDB();
 
+// Routes
 app.use("/api/auth", authRoute);
 
-// Health check
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'OK', message: 'Server is running' });
+// Root health check
+app.get("/", (req, res) => {
+    res.status(200).json({ status: 'OK', system: 'Royal Orient API', version: '1.0.0' });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;

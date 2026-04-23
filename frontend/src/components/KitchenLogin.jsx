@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FaUtensils, FaLock, FaArrowRight } from "react-icons/fa";
 import { AuthContext } from "../context/auth-context";
+import API_BASE_URL from "../apiConfig";
 import "./Login.css";
 
 const KitchenLogin = () => {
@@ -17,7 +18,7 @@ const KitchenLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/login", {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         email,
         password,
       });
@@ -38,76 +39,53 @@ const KitchenLogin = () => {
   };
 
   return (
-    <div className="login-wrapper kitchen-bg">
-      <div className="login-bg-overlay"></div>
+    <div className="auth-page-luxury">
+      <div className="auth-split-left">
+        <div className="auth-card-premium">
+          <h2 className="auth-title-premium">Kitchen Ops</h2>
+          <p className="auth-subtitle-premium">Back-of-House Management</p>
 
-      <div className="login-glass-card">
-        <h2 className="login-card-title">Kitchen Ops</h2>
-        <span className="login-card-subtitle">Back-of-House Management</span>
-
-        <form onSubmit={handleLogin}>
-          <div className="login-input-group">
-            <label htmlFor="email">Staff Identity</label>
-            <div className="login-input-wrapper">
-              <FaUtensils className="login-input-icon" />
+          <form onSubmit={handleLogin} className="d-flex flex-column gap-3">
+            <div className="auth-input-group">
+              <label>Staff Identity</label>
               <input
                 type="email"
-                className="login-input-premium"
-                id="email"
-                placeholder="Enter staff email"
+                className="auth-input-premium"
+                placeholder="Staff Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={loading}
               />
             </div>
-          </div>
 
-          <div className="login-input-group">
-            <label htmlFor="password">Station Key</label>
-            <div className="login-input-wrapper">
-              <FaLock className="login-input-icon" />
+            <div className="auth-input-group">
+              <label>Station Key</label>
               <input
                 type="password"
-                className="login-input-premium"
-                id="password"
-                placeholder="Enter station key"
+                className="auth-input-premium"
+                placeholder="Security Pin"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={loading}
               />
             </div>
+
+            <button type="submit" className="auth-btn-primary mt-3" disabled={loading} style={{ background: '#334155' }}>
+              {loading ? "VERIFYING..." : "ENTER KITCHEN"}
+            </button>
+          </form>
+
+          <div className="auth-footer">
+            <Link to="/" className="auth-link-gold small">Return to Site</Link>
           </div>
-
-          <button
-            type="submit"
-            className="login-btn-premium btn-kitchen-accent"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Verifying...
-              </>
-            ) : (
-              <>
-                Enter Kitchen <FaArrowRight />
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p>
-            Authorized personnel only.
-          </p>
-          <p style={{ marginTop: "15px" }}>
-            <Link to="/" className="link-gold">
-              Return to Site
-            </Link>
-          </p>
         </div>
+      </div>
+
+      <div className="auth-split-right">
+          <div className="text-center animate-in">
+              <div className="display-4 fw-900 text-white opacity-20">KITCHEN</div>
+              <div className="h6 text-white tracking-widest mt-2">OPERATIONAL ACCESS</div>
+          </div>
       </div>
     </div>
   );

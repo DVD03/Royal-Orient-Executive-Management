@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FaUserShield, FaKey, FaChevronRight } from "react-icons/fa";
 import { AuthContext } from "../context/auth-context";
+import API_BASE_URL from "../apiConfig";
 import "./Login.css";
 
 const AdminLogin = () => {
@@ -17,7 +18,7 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/login", { email, password });
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
       const data = res.data;
 
       if (data.role !== "admin") {
@@ -35,72 +36,53 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="login-wrapper admin-bg">
-      <div className="login-bg-overlay"></div>
+    <div className="auth-page-luxury">
+      <div className="auth-split-left">
+        <div className="auth-card-premium">
+          <h2 className="auth-title-premium">Administrator</h2>
+          <p className="auth-subtitle-premium">Secure Access Terminal</p>
 
-      <div className="login-glass-card">
-        <h2 className="login-card-title">Administrator</h2>
-        <span className="login-card-subtitle">Secure System Access Terminal</span>
-
-        <form onSubmit={handleLogin}>
-          <div className="login-input-group">
-            <label htmlFor="email">System Identity</label>
-            <div className="login-input-wrapper">
-              <FaUserShield className="login-input-icon" />
+          <form onSubmit={handleLogin} className="d-flex flex-column gap-3">
+            <div className="auth-input-group">
+              <label>System Identity</label>
               <input
                 type="email"
-                className="login-input-premium"
-                id="email"
-                placeholder="Enter admin email"
+                className="auth-input-premium"
+                placeholder="Admin Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={loading}
               />
             </div>
-          </div>
 
-          <div className="login-input-group">
-            <label htmlFor="password">Access Key</label>
-            <div className="login-input-wrapper">
-              <FaKey className="login-input-icon" />
+            <div className="auth-input-group">
+              <label>Access Key</label>
               <input
                 type="password"
-                className="login-input-premium"
-                id="password"
-                placeholder="Enter access key"
+                className="auth-input-premium"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={loading}
               />
             </div>
+
+            <button type="submit" className="auth-btn-primary mt-3" disabled={loading} style={{ background: '#b45309' }}>
+              {loading ? "AUTHORIZING..." : "AUTHORIZE ACCESS"}
+            </button>
+          </form>
+
+          <div className="auth-footer">
+            <Link to="/" className="auth-link-gold small">RETURN TO COMMAND CENTER</Link>
           </div>
-
-          <button
-            type="submit"
-            className="login-btn-premium btn-admin-accent"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Verifying Credentials...
-              </>
-            ) : (
-              <>
-                Authorize Access <FaChevronRight />
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p>This is a restricted administrative interface.</p>
-          <p style={{ marginTop: "15px" }}>
-            <Link to="/" className="link-gold">Back to Homepage</Link>
-          </p>
         </div>
+      </div>
+
+      <div className="auth-split-right">
+          <div className="text-center animate-in">
+              <div className="display-4 fw-900 text-white opacity-20">SECURE</div>
+              <div className="h6 text-white tracking-widest mt-2">ENCRYPTED PORTAL</div>
+          </div>
       </div>
     </div>
   );

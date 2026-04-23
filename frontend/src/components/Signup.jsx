@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { FaUser, FaEnvelope, FaLock, FaKey } from "react-icons/fa";
+import API_BASE_URL from "../apiConfig";
 import "./Signup.css";
 
 const Signup = () => {
@@ -28,7 +29,7 @@ const Signup = () => {
     }
 
     try {
-      await axios.post("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/signup", {
+      await axios.post(`${API_BASE_URL}/api/auth/signup`, {
         name,
         email,
         password,
@@ -44,98 +45,82 @@ const Signup = () => {
   };
 
   return (
-    <div className={`signup-wrapper ${role}`}>
-      <div className="signup-bg-overlay"></div>
+    <div className="auth-page-luxury">
+      <div className="auth-split-left">
+        <div className="auth-card-premium" style={{ maxWidth: '480px' }}>
+          <h2 className="auth-title-premium">Staff Registry</h2>
+          <p className="auth-subtitle-premium">{role} Onboarding</p>
 
-      <div className="signup-glass-card">
-        <h2 className="signup-card-title">Sign Up</h2>
-        <span className="signup-card-subtitle">{role} registration</span>
+          {error && <div className="alert alert-danger tiny mb-4">{error}</div>}
 
-        {error && <div className="signup-error-alert">{error}</div>}
-
-        <form onSubmit={handleSignup}>
-          <div className="premium-input-group">
-            <label htmlFor="name">Full Name</label>
-            <div className="input-with-icon">
-              <FaUser className="input-icon" />
+          <form onSubmit={handleSignup} className="d-flex flex-column gap-3">
+            <div className="auth-input-group">
+              <label>Full Nomenclature</label>
               <input
                 type="text"
-                className="premium-input"
-                id="name"
-                placeholder="Enter your full name"
+                className="auth-input-premium"
+                placeholder="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
-          </div>
 
-          <div className="premium-input-group">
-            <label htmlFor="email">Email Address</label>
-            <div className="input-with-icon">
-              <FaEnvelope className="input-icon" />
+            <div className="auth-input-group">
+              <label>Corporate Email</label>
               <input
                 type="email"
-                className="premium-input"
-                id="email"
-                placeholder="Enter email address"
+                className="auth-input-premium"
+                placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
-          </div>
 
-          <div className="premium-input-group">
-            <label htmlFor="password">Security Password</label>
-            <div className="input-with-icon">
-              <FaLock className="input-icon" />
+            <div className="auth-input-group">
+              <label>Security Key</label>
               <input
                 type="password"
-                className="premium-input"
-                id="password"
-                placeholder="Create a strong password"
+                className="auth-input-premium"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
-          </div>
 
-          {requiresKey && (
-            <div className="premium-input-group">
-              <label htmlFor="key">Access Key</label>
-              <div className="input-with-icon">
-                <FaKey className="input-icon" />
+            {requiresKey && (
+              <div className="auth-input-group">
+                <label>Operational Signup Key</label>
                 <input
                   type="text"
-                  className="premium-input"
-                  id="key"
-                  placeholder="Enter staff signup key"
+                  className="auth-input-premium"
+                  placeholder="Enter signup key"
                   value={key}
                   onChange={(e) => setKey(e.target.value)}
                   required
                 />
               </div>
-            </div>
-          )}
+            )}
 
-          <button
-            type="submit"
-            className={`signup-btn-premium ${role === 'cashier' ? 'btn-cashier-accent' : 'btn-kitchen-accent'}`}
-          >
-            Create {role} Account
-          </button>
-        </form>
+            <button type="submit" className="auth-btn-primary mt-3">
+              AUTHORIZE ACCOUNT CREATION
+            </button>
+          </form>
 
-        <div className="signup-footer">
-          <p>
-            Already part of the team?
-            <Link to={`/${role}-login`} className="login-link-premium">
-              Sign In
-            </Link>
-          </p>
+          <div className="auth-footer">
+            <p className="tiny text-muted mb-2">Already authenticated?</p>
+            <Link to={`/${role}-login`} className="auth-link-gold small">SIGN IN TO STATION</Link>
+          </div>
         </div>
+      </div>
+
+      <div className="auth-split-right">
+          <div className="text-center animate-in">
+              <div className="display-4 fw-900 text-white opacity-20">ENROLL</div>
+              <div className="h6 text-white tracking-widest mt-2">PERSONNEL ONBOARDING</div>
+          </div>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import {
   FaCalendarCheck, FaClock, FaUserClock, FaHistory, FaFilter, FaPrint, FaUserTie, FaChevronRight, FaDatabase
 } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
+import API_BASE_URL from "../apiConfig";
 import "../styles/PremiumUI.css";
 
 const AttendanceDashboard = () => {
@@ -21,7 +22,7 @@ const AttendanceDashboard = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/attendance/summary?month=${month}&year=${year}`, {
+      const res = await axios.get(`${API_BASE_URL}/api/auth/attendance/summary?month=${month}&year=${year}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAttendance(res.data.attendance || []);

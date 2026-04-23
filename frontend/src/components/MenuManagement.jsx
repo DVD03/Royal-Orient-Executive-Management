@@ -14,8 +14,10 @@ import {
   FaFilter,
   FaLayerGroup,
   FaImage,
-  FaCloudUploadAlt
+  FaCloudUploadAlt,
+  FaWindowClose
 } from "react-icons/fa";
+import API_BASE_URL from "../apiConfig";
 import "../styles/PremiumUI.css";
 
 const MenuManagement = () => {
@@ -44,7 +46,7 @@ const MenuManagement = () => {
   const fetchMenus = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/menus", {
+      const res = await axios.get(`${API_BASE_URL}/api/auth/menus`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMenus(res.data || []);
@@ -70,7 +72,7 @@ const MenuManagement = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/menu", formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/menu`, formData, {
         headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` }
       });
       setMenus([...menus, res.data]);
@@ -88,7 +90,7 @@ const MenuManagement = () => {
     if (!window.confirm("Purge this item from catalog?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/menu/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/auth/menu/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMenus(menus.filter((m) => m._id !== id));

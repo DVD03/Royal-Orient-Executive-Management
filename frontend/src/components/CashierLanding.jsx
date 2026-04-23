@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { FaSearch, FaShoppingCart, FaUser, FaTrash, FaPlus, FaMinus, FaUtensils, FaArrowRight, FaPrint, FaWindowClose, FaPhone, FaChevronDown, FaChevronUp, FaTag } from "react-icons/fa";
 import PaymentModal from "./PaymentModal";
 import ReceiptModal from "./ReceiptModal";
+import API_BASE_URL from "../apiConfig";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/PremiumUI.css";
 
@@ -37,7 +38,7 @@ const CashierLanding = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       const [menusRes] = await Promise.all([
-        axios.get("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/menus", config)
+        axios.get(`${API_BASE_URL}/api/auth/menus`, config)
       ]);
 
       setMenus(menusRes.data || []);

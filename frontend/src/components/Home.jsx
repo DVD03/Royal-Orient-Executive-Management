@@ -7,56 +7,45 @@ import "./Home.css";
 
 const Home = () => {
   return (
-    <div className="home-wrapper">
-      <div className="bg-overlay"></div>
+    <div className="auth-page-luxury">
+      <div className="auth-split-left">
+        <div className="auth-card-premium">
+          <div className="auth-logo-box">
+             <img src={LogoImage} alt="Royal Orient Logo" />
+          </div>
+          
+          <h1 className="auth-title-premium">Royal Orient</h1>
+          <p className="auth-subtitle-premium">Executive Management</p>
+          
+          <div className="d-flex flex-column gap-3 mt-5">
+            <Link to="/cashier-login" className="auth-btn-primary">
+               <FaCashRegister /> CASHIER TERMINAL
+            </Link>
+
+            <Link to="/kitchen-login" className="auth-btn-primary" style={{ background: '#334155' }}>
+               <FaFire /> KITCHEN OPERATIONS
+            </Link>
+
+            <Link to="/admin-login" className="auth-btn-primary" style={{ background: '#b45309' }}>
+               <FaShieldAlt /> ADMINISTRATION
+            </Link>
+          </div>
+
+          <div className="auth-footer mt-5">
+            <p className="tiny text-muted mb-3">NEW PERSONNEL REGISTRATION</p>
+            <div className="d-flex justify-content-center gap-4">
+              <Link to="/signup?role=cashier" className="auth-link-gold small">CASHIER</Link>
+              <Link to="/signup?role=kitchen" className="auth-link-gold small">KITCHEN</Link>
+            </div>
+          </div>
+        </div>
+      </div>
       
-      <div className="glass-card">
-        <div className="logo-container">
-          <div className="logo-ring">
-            <img
-              src={LogoImage}
-              alt="Royal Orient Logo"
-              className="logo-img"
-            />
+      <div className="auth-split-right">
+          <div className="position-relative z-10 text-center animate-in">
+              <div className="display-1 fw-900 text-white opacity-10">ROYAL</div>
+              <div className="h4 fw-100 text-white tracking-widest mt-n4">ORIENT</div>
           </div>
-        </div>
-
-        <h1 className="home-title">Royal Orient</h1>
-        <p className="home-subtitle">Restaurant Management</p>
-        
-        <p className="signup-text" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "25px" }}>
-          Welcome back. Please select your department:
-        </p>
-
-        <div className="login-options">
-          <Link to="/cashier-login" className="premium-btn btn-cashier">
-             <FaCashRegister className="btn-icon" /> Cashier Login
-          </Link>
-
-          <Link to="/kitchen-login" className="premium-btn btn-kitchen">
-             <FaFire className="btn-icon" /> Kitchen Login
-          </Link>
-
-          <Link to="/admin-login" className="premium-btn btn-admin">
-             <FaShieldAlt className="btn-icon" /> Admin Login
-          </Link>
-        </div>
-
-        <div className="signup-section">
-          <p className="signup-text">New account registration:</p>
-          <div className="signup-btns">
-            <Link to="/signup?role=cashier" className="btn-signup">
-              Cashier
-            </Link>
-            <Link to="/signup?role=kitchen" className="btn-signup">
-              Kitchen
-            </Link>
-          </div>
-        </div>
-
-        <div className="footer-text">
-          © 2026 ROYAL ORIENT SYSTEM • PREMIER EDITION
-        </div>
       </div>
     </div>
   );

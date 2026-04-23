@@ -4,6 +4,7 @@ import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaMoneyCheckAlt, FaHistory, FaUserTie, FaCoins, FaClock, FaCalendarAlt, FaDatabase, FaChevronRight } from "react-icons/fa";
+import API_BASE_URL from "../apiConfig";
 import "../styles/PremiumUI.css";
 
 const SalaryPage = () => {
@@ -29,8 +30,8 @@ const SalaryPage = () => {
     const headers = { Authorization: `Bearer ${token}` };
     try {
       const [empRes, salRes] = await Promise.all([
-        axios.get("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/employees", { headers }),
-        axios.get("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/salaries", { headers })
+        axios.get(`${API_BASE_URL}/api/auth/employees`, { headers }),
+        axios.get(`${API_BASE_URL}/api/auth/salaries`, { headers })
       ]);
       setEmployees(empRes.data);
       setSalaries(salRes.data);
@@ -70,7 +71,7 @@ const SalaryPage = () => {
         otHours: parseInt(formData.otHours || 0),
         otRate: parseFloat(formData.otRate || 0)
       };
-      await axios.post("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/salary/add", payload, {
+      await axios.post(`${API_BASE_URL}/api/auth/salary/add`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Payroll record committed");

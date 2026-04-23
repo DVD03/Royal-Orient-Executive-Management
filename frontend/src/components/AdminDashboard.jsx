@@ -32,6 +32,7 @@ import {
   Zap,
   Globe
 } from "lucide-react";
+import API_BASE_URL from "../apiConfig";
 import "../styles/PremiumUI.css";
 
 ChartJS.register(
@@ -130,7 +131,7 @@ const AdminDashboard = () => {
       }
 
       const res = await axios.get(
-        "https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/admin/summary",
+        `${API_BASE_URL}/api/auth/admin/summary`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params: payload
