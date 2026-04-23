@@ -10,7 +10,8 @@ import {
   FaSyncAlt,
   FaUserAlt,
   FaShoppingBag,
-  FaHistory
+  FaHistory,
+  FaChevronRight
 } from "react-icons/fa";
 import "../styles/PremiumUI.css";
 
@@ -48,7 +49,7 @@ const KitchenLanding = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOrders(prev => prev.filter(o => o._id !== id));
-      toast.success("Order marked as ready!");
+      toast.success("Order dispatched to pickup!");
     } catch (err) {
       toast.error("Failed to update status");
     }
@@ -56,68 +57,63 @@ const KitchenLanding = () => {
 
   const liveOrders = orders.filter(o => ["Pending", "Processing"].includes(o.status));
 
-  if (loading) return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border text-gold"></div></div>;
+  if (loading) return (
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-white">
+        <div className="text-center">
+            <div className="spinner-border text-primary mb-3"></div>
+            <div className="text-muted fw-bold">Syncing Kitchen Display...</div>
+        </div>
+    </div>
+  );
 
   return (
-    <div className="kitchen-dashboard animate-fade-in">
-      <ToastContainer theme="dark" />
+    <div className="kitchen-dashboard animate-fade-in p-2">
+      <ToastContainer theme="light" />
       
-      {/* Header */}
+      {/* Platinum Header */}
       <div className="d-flex justify-content-between align-items-end mb-5 flex-wrap gap-4">
         <div>
-          <h1 className="premium-title mb-1">Kitchen Operations</h1>
-          <p className="premium-subtitle mb-0">Live prep queue and order fulfillment</p>
+          <h1 className="premium-title">Kitchen Operations</h1>
+          <p className="premium-subtitle">Live prep queue and order fulfillment</p>
         </div>
         <div className="d-flex gap-3">
-            <div className="orient-card py-2 px-4 d-flex align-items-center gap-2">
-                <FaFire className="text-danger" />
-                <span className="fw-bold text-white">{liveOrders.length} Active</span>
+            <div className="orient-card py-2 px-4 d-flex align-items-center gap-3 bg-white">
+                <div className="bg-red-glow p-2 rounded-circle"><FaFire size={14} /></div>
+                <span className="fw-800">{liveOrders.length} Active Orders</span>
             </div>
             <button className="btn-premium btn-premium-primary" onClick={() => fetchOrders(true)}>
-                <FaSyncAlt /> Refresh
+                <FaSyncAlt /> Sync Dashboard
             </button>
         </div>
       </div>
 
-      {/* Stats Summary */}
+      {/* Stats Summary Widgets */}
       <div className="row g-4 mb-5">
-        <div className="col-md-4">
-            <div className="orient-card orient-stat-card py-3">
-                <div className="orient-stat-icon bg-warning-glow"><FaClock size={20} /></div>
-                <div>
-                    <div className="orient-stat-label">Pending Prep</div>
-                    <div className="orient-stat-value" style={{ fontSize: '1.4rem' }}>{liveOrders.filter(o => o.status === 'Pending').length}</div>
+        {[
+            { label: "Pending Prep", val: liveOrders.filter(o => o.status === 'Pending').length, icon: FaClock, color: 'blue' },
+            { label: "In Progress", val: liveOrders.filter(o => o.status === 'Processing').length, icon: FaUtensils, color: 'green' },
+            { label: "Recently Ready", val: orders.filter(o => o.status === 'Ready').length, icon: FaCheckCircle, color: 'gold' }
+        ].map((stat, i) => (
+            <div className="col-md-4" key={i}>
+                <div className="orient-card orient-stat-card py-3">
+                    <div className={`orient-stat-icon bg-${stat.color}-glow`}><stat.icon size={20} /></div>
+                    <div>
+                        <div className="orient-stat-label">{stat.label}</div>
+                        <div className="orient-stat-value" style={{ fontSize: '1.4rem' }}>{stat.val}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div className="col-md-4">
-            <div className="orient-card orient-stat-card py-3">
-                <div className="orient-stat-icon bg-blue-glow"><FaUtensils size={20} /></div>
-                <div>
-                    <div className="orient-stat-label">Processing</div>
-                    <div className="orient-stat-value" style={{ fontSize: '1.4rem' }}>{liveOrders.filter(o => o.status === 'Processing').length}</div>
-                </div>
-            </div>
-        </div>
-        <div className="col-md-4">
-            <div className="orient-card orient-stat-card py-3">
-                <div className="orient-stat-icon bg-success-glow"><FaCheckCircle size={20} /></div>
-                <div>
-                    <div className="orient-stat-label">Recently Ready</div>
-                    <div className="orient-stat-value" style={{ fontSize: '1.4rem' }}>{orders.filter(o => o.status === 'Ready').length}</div>
-                </div>
-            </div>
-        </div>
+        ))}
       </div>
 
       {/* Orders Grid */}
       <div className="row g-4">
         {liveOrders.length === 0 ? (
             <div className="col-12 text-center py-5">
-                <div className="orient-card py-5">
-                    <FaHistory size={50} className="orient-text-muted mb-3 opacity-20" />
-                    <h4 className="text-white">All Clear!</h4>
-                    <p className="orient-text-muted">No active orders in the queue right now.</p>
+                <div className="orient-card py-5 bg-white">
+                    <FaHistory size={64} className="text-muted mb-3 opacity-10" />
+                    <h4 className="fw-900 text-main">Kitchen Queue Empty</h4>
+                    <p className="text-muted">No active orders awaiting preparation.</p>
                 </div>
             </div>
         ) : (
@@ -128,11 +124,11 @@ const KitchenLanding = () => {
 
                 return (
                     <div className="col-xl-4 col-lg-6" key={order._id}>
-                        <div className={`orient-card h-100 d-flex flex-column p-0 overflow-hidden ${isLate ? 'border-danger' : ''}`}>
-                            <div className="p-3 border-bottom border-white-05 d-flex justify-content-between align-items-center" style={{ background: isLate ? 'rgba(217, 4, 41, 0.1)' : 'rgba(255,255,255,0.02)' }}>
+                        <div className={`orient-card h-100 d-flex flex-column p-0 overflow-hidden bg-white shadow-platinum ${isLate ? 'border-danger' : ''}`}>
+                            <div className="p-3 border-bottom d-flex justify-content-between align-items-center" style={{ background: isLate ? 'var(--danger-light)' : 'var(--bg-main)' }}>
                                 <div>
-                                    <span className="orient-stat-label d-block" style={{ fontSize: '0.6rem' }}>Order ID</span>
-                                    <span className="text-white fw-bold">#{order.invoiceNo || order._id.slice(-6)}</span>
+                                    <span className="orient-stat-label d-block" style={{ fontSize: '0.6rem' }}>TICKET ID</span>
+                                    <span className="text-main fw-900">#{order.invoiceNo || order._id.slice(-6)}</span>
                                 </div>
                                 <div className={`badge-premium ${isLate ? 'badge-danger' : order.status === 'Pending' ? 'badge-warning' : 'badge-primary'}`}>
                                     {order.status} • {elapsedMin}m
@@ -141,30 +137,30 @@ const KitchenLanding = () => {
                             
                             <div className="p-4 flex-grow-1">
                                 <div className="d-flex align-items-center gap-3 mb-4">
-                                    <div className="bg-white-05 p-2 rounded-3"><FaUserAlt className="text-gold" size={14} /></div>
-                                    <div className="text-white fw-bold">{order.customerName}</div>
-                                    <div className="ms-auto text-gold small">{order.tableNo ? `Table ${order.tableNo}` : 'Takeaway'}</div>
+                                    <div className="bg-blue-glow p-2 rounded-3"><FaUserAlt size={14} /></div>
+                                    <div className="text-main fw-800">{order.customerName}</div>
+                                    <div className="ms-auto text-primary fw-bold small">{order.tableNo ? `Table ${order.tableNo}` : 'Takeaway'}</div>
                                 </div>
 
                                 <div className="d-flex flex-column gap-2 mb-4">
                                     {order.items.map((item, idx) => (
-                                        <div key={idx} className="d-flex justify-content-between align-items-center p-2 rounded-3 bg-white-02">
-                                            <span className="text-white small fw-bold">{item.name}</span>
-                                            <span className="qty-tag">x{item.quantity}</span>
+                                        <div key={idx} className="d-flex justify-content-between align-items-center p-2 rounded-3 bg-light border">
+                                            <span className="text-main small fw-bold">{item.name}</span>
+                                            <span className="badge-premium badge-primary" style={{ fontSize: '0.7rem' }}>x{item.quantity}</span>
                                         </div>
                                     ))}
                                 </div>
 
                                 {order.notes && (
-                                    <div className="p-2 rounded-3 bg-danger-glow mb-4 small text-danger border-danger-01">
-                                        <strong>Note:</strong> {order.notes}
+                                    <div className="p-3 rounded-4 bg-danger-light small text-danger border-dashed border-danger">
+                                        <strong>Chef's Note:</strong> {order.notes}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="p-3 bg-black-20">
-                                <button className="btn-premium btn-premium-secondary w-100 py-3" onClick={() => markAsReady(order._id)}>
-                                    <FaCheckCircle className="me-2" /> Mark as Ready
+                            <div className="p-3 bg-light border-top mt-auto">
+                                <button className="btn-premium btn-premium-secondary w-100 py-3 rounded-4 shadow-sm" onClick={() => markAsReady(order._id)}>
+                                    <FaCheckCircle className="me-2" /> Mark as Prepared <FaChevronRight className="ms-auto opacity-50" size={10} />
                                 </button>
                             </div>
                         </div>
@@ -175,17 +171,13 @@ const KitchenLanding = () => {
       </div>
 
       <style>{`
-        .bg-warning-glow { background: rgba(255, 183, 3, 0.2); color: #FFB703; }
-        .bg-success-glow { background: rgba(0, 255, 127, 0.2); color: #00FF7F; }
-        .bg-blue-glow { background: rgba(0, 180, 216, 0.2); color: #00B4D8; }
-        .bg-white-05 { background: rgba(255,255,255,0.05); }
-        .bg-white-02 { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); }
-        .qty-tag { background: var(--orient-gold); color: #023047; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.7rem; }
-        .bg-black-20 { background: rgba(0,0,0,0.2); }
-        .bg-danger-glow { background: rgba(217, 4, 41, 0.05); }
-        .border-danger-01 { border: 1px solid rgba(217, 4, 41, 0.1); }
-        .border-danger { border-color: #D90429 !important; box-shadow: 0 0 15px rgba(217, 4, 41, 0.2); }
-        .border-white-05 { border-color: rgba(255,255,255,0.05) !important; }
+        .bg-blue-glow { background: var(--primary-light); color: var(--primary); }
+        .bg-green-glow { background: var(--success-light); color: var(--success); }
+        .bg-red-glow { background: var(--danger-light); color: var(--danger); }
+        .bg-gold-glow { background: var(--warning-light); color: var(--warning); }
+        .fw-800 { font-weight: 800; }
+        .fw-900 { font-weight: 900; }
+        .border-dashed { border-style: dashed !important; }
       `}</style>
     </div>
   );
