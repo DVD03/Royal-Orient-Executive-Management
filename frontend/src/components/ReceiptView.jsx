@@ -43,7 +43,7 @@ const ReceiptView = () => {
 
   return (
     <div style={{ maxWidth: "400px", margin: "auto", padding: "20px", fontFamily: "monospace" }}>
-      <h3 className="text-center">Demo Resturant</h3>
+      <h3 className="text-center">Royal Orient</h3>
       <p><strong>Date:</strong> {new Date(order.date).toLocaleString()}</p>
       <p><strong>Customer:</strong> {order.customerName}</p>
       <p><strong>Phone:</strong> {order.customerPhone}</p>

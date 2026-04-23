@@ -3,7 +3,7 @@ import axios from "axios";
 import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaMoneyCheckAlt, FaHistory, FaUserTie, FaCoins, FaClock } from "react-icons/fa";
+import { FaMoneyCheckAlt, FaHistory, FaUserTie, FaCoins, FaClock, FaCalendarAlt, FaDatabase, FaChevronRight } from "react-icons/fa";
 import "../styles/PremiumUI.css";
 
 const SalaryPage = () => {
@@ -58,7 +58,7 @@ const SalaryPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.employee || !formData.basicSalary) {
-      toast.error("Please complete the personnel selection");
+      toast.error("Personnel selection required");
       return;
     }
     setLoading(true);
@@ -84,46 +84,69 @@ const SalaryPage = () => {
   };
 
   const selectStyles = {
-    control: (base) => ({
+    control: (base, state) => ({
       ...base,
-      background: 'rgba(255,255,255,0.05)',
-      borderColor: 'rgba(255,255,255,0.1)',
+      background: '#ffffff',
+      borderColor: state.isFocused ? 'var(--primary)' : 'var(--border-light)',
       borderRadius: '12px',
-      padding: '5px',
-      color: '#fff'
+      padding: '4px',
+      fontSize: '0.9rem',
+      fontWeight: '600',
+      boxShadow: state.isFocused ? '0 0 0 4px var(--primary-glow)' : 'none',
+      transition: 'all 0.2s',
+      '&:hover': { borderColor: 'var(--primary)' }
     }),
-    singleValue: (base) => ({ ...base, color: '#fff' }),
-    menu: (base) => ({ ...base, background: '#023047', border: '1px solid var(--orient-gold)' }),
+    singleValue: (base) => ({ ...base, color: 'var(--text-main)' }),
+    placeholder: (base) => ({ ...base, color: 'var(--text-muted)' }),
+    menu: (base) => ({ 
+      ...base, 
+      background: '#ffffff', 
+      borderRadius: '12px', 
+      boxShadow: 'var(--shadow-lg)', 
+      border: '1px solid var(--border-light)',
+      zIndex: 100
+    }),
     option: (base, state) => ({
       ...base,
-      background: state.isFocused ? 'rgba(255,183,3,0.1)' : 'transparent',
-      color: '#fff'
+      background: state.isFocused ? 'var(--primary-light)' : 'transparent',
+      color: state.isFocused ? 'var(--primary)' : 'var(--text-main)',
+      fontWeight: '600',
+      cursor: 'pointer'
     })
   };
 
+  if (loading && salaries.length === 0) return (
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-white">
+        <div className="text-center">
+            <div className="spinner-border text-primary mb-3"></div>
+            <div className="fw-900 text-main">Syncing Payroll Cloud...</div>
+        </div>
+    </div>
+  );
+
   return (
-    <div className="payroll-container animate-fade-in">
-      <ToastContainer theme="dark" />
+    <div className="payroll-layout animate-in p-2">
+      <ToastContainer theme="light" />
       
       <div className="d-flex justify-content-between align-items-end mb-5 flex-wrap gap-4">
         <div>
-          <h1 className="premium-title mb-1">Payroll Management</h1>
-          <p className="premium-subtitle mb-0">Disburse salaries and manage employee compensation</p>
+          <h1 className="premium-title">Payroll Governance</h1>
+          <p className="premium-subtitle">Disburse salaries and manage employee compensation cycles</p>
         </div>
       </div>
 
-      <div className="row g-5">
+      <div className="row g-4">
         {/* Form Column */}
-        <div className="col-xl-5">
-            <div className="premium-card p-4">
+        <div className="col-xl-4">
+            <div className="orient-card border-0 shadow-platinum bg-white p-4">
                 <div className="d-flex align-items-center gap-3 mb-4">
-                    <div className="bg-gold-glow p-3 rounded-circle"><FaMoneyCheckAlt className="text-gold" size={24} /></div>
-                    <h3 className="premium-title h5 mb-0">Disbursement Voucher</h3>
+                    <div className="bg-gold-glow p-2 rounded-circle"><FaMoneyCheckAlt size={18} className="text-warning" /></div>
+                    <h5 className="mb-0 fw-900 text-main">Disbursement Voucher</h5>
                 </div>
                 
-                <form onSubmit={handleSubmit} className="d-flex flex-column gap-4">
-                    <div>
-                        <label className="orient-stat-label">Recipient Personnel</label>
+                <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
+                    <div className="col-12">
+                        <label className="stat-label mb-2 d-block">Recipient Personnel</label>
                         <Select 
                             styles={selectStyles}
                             options={employees.map(e => ({ value: e._id, label: e.name, basicSalary: e.basicSalary, otHourRate: e.otHourRate }))}
@@ -134,78 +157,88 @@ const SalaryPage = () => {
                     </div>
 
                     <div className="row g-3">
-                        <div className="col-md-6">
-                            <label className="orient-stat-label">Basic Salary ({symbol})</label>
+                        <div className="col-6">
+                            <label className="stat-label mb-2 d-block">Basic Salary ({symbol})</label>
                             <div className="position-relative">
-                                <FaCoins className="position-absolute top-50 start-0 translate-middle-y ms-3 text-gold" />
-                                <input type="number" className="premium-input ps-5" value={formData.basicSalary} onChange={(e) => setFormData({...formData, basicSalary: e.target.value})} />
+                                <FaCoins className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" size={10} />
+                                <input type="number" className="premium-input bg-app border-0 ps-5 fw-800" value={formData.basicSalary} onChange={(e) => setFormData({...formData, basicSalary: e.target.value})} />
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <label className="orient-stat-label">OT Rate /Hr</label>
+                        <div className="col-6">
+                            <label className="stat-label mb-2 d-block">OT Rate /Hr</label>
                             <div className="position-relative">
-                                <FaClock className="position-absolute top-50 start-0 translate-middle-y ms-3 text-gold" />
-                                <input type="number" className="premium-input ps-5" value={formData.otRate} onChange={(e) => setFormData({...formData, otRate: e.target.value})} />
+                                <FaClock className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" size={10} />
+                                <input type="number" className="premium-input bg-app border-0 ps-5 fw-800" value={formData.otRate} onChange={(e) => setFormData({...formData, otRate: e.target.value})} />
                             </div>
                         </div>
                         <div className="col-12">
-                            <label className="orient-stat-label">Overtime Hours Worked</label>
-                            <input type="number" className="premium-input" placeholder="0" value={formData.otHours} onChange={(e) => setFormData({...formData, otHours: e.target.value})} />
+                            <label className="stat-label mb-2 d-block">Overtime Hours Worked</label>
+                            <input type="number" className="premium-input bg-app border-0" placeholder="0" value={formData.otHours} onChange={(e) => setFormData({...formData, otHours: e.target.value})} />
                         </div>
                     </div>
 
-                    <div className="orient-card p-3 bg-white-02 border-white-05">
+                    <div className="p-4 bg-app rounded-4 border my-2">
                         <div className="d-flex justify-content-between align-items-center">
-                            <span className="orient-stat-label">Net Disbursement</span>
-                            <span className="text-gold fw-bold h4 mb-0">
+                            <span className="stat-label">NET DISBURSEMENT</span>
+                            <span className="text-primary fw-900 h4 mb-0">
                                 {symbol}{(parseFloat(formData.basicSalary || 0) + (parseFloat(formData.otHours || 0) * parseFloat(formData.otRate || 0))).toFixed(2)}
                             </span>
                         </div>
                     </div>
 
-                    <button type="submit" className="btn-premium btn-premium-secondary py-3" disabled={loading}>
-                        <FaMoneyCheckAlt className="me-2" /> Authorize Payment
+                    <button type="submit" className="btn-premium btn-primary py-3 rounded-4 shadow-sm w-100" disabled={loading}>
+                        <FaMoneyCheckAlt className="me-2" /> AUTHORIZE PAYMENT
                     </button>
                 </form>
             </div>
         </div>
 
         {/* List Column */}
-        <div className="col-xl-7">
-            <div className="orient-card p-0 overflow-hidden">
-                <div className="p-4 border-bottom border-white-05 d-flex justify-content-between align-items-center">
-                    <h5 className="text-white mb-0"><FaHistory className="me-2 text-gold" /> Payroll History</h5>
+        <div className="col-xl-8">
+            <div className="orient-card p-0 border-0 shadow-platinum bg-white overflow-hidden">
+                <div className="p-4 border-bottom d-flex justify-content-between align-items-center bg-light">
+                    <h6 className="mb-0 fw-800 text-main d-flex align-items-center gap-2">
+                        <FaDatabase className="text-primary" /> Payroll Execution History
+                    </h6>
+                    <span className="badge badge-blue">Verified Payouts</span>
                 </div>
-                <div className="premium-table-container">
+                
+                <div className="table-container border-0">
                     <table className="premium-table">
                         <thead>
                             <tr>
-                                <th>Personnel</th>
-                                <th>Basic</th>
-                                <th>OT Hours</th>
-                                <th>Total Paid</th>
-                                <th>Date</th>
+                                <th>Personnel Node</th>
+                                <th>Base Valuation</th>
+                                <th>OT Component</th>
+                                <th>Gross Payout</th>
+                                <th>Execution Date</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {loading ? (
-                                <tr><td colSpan="5" className="text-center py-5"><div className="spinner-border text-gold"></div></td></tr>
-                            ) : salaries.length === 0 ? (
-                                <tr><td colSpan="5" className="text-center py-5 text-muted">No historical payroll data found.</td></tr>
-                            ) : salaries.slice(0, 15).map(sal => (
+                            {salaries.length > 0 ? salaries.slice(0, 15).map(sal => (
                                 <tr key={sal._id}>
                                     <td>
-                                        <div className="d-flex align-items-center gap-2">
-                                            <FaUserTie className="text-gold opacity-50" size={12} />
-                                            <div className="text-white small fw-bold">{sal.employee?.name}</div>
+                                        <div className="d-flex align-items-center gap-3">
+                                            <div className="bg-app p-2 rounded-circle"><FaUserTie className="text-primary" size={14} /></div>
+                                            <div className="text-main fw-800">{sal.employee?.name}</div>
                                         </div>
                                     </td>
-                                    <td><div className="small text-white opacity-70">{symbol}{sal.basicSalary?.toFixed(2)}</div></td>
-                                    <td><div className="small text-white">{sal.otHours} hrs</div></td>
-                                    <td><div className="text-gold fw-bold">{symbol}{sal.total?.toFixed(2)}</div></td>
-                                    <td><div className="small orient-text-muted">{new Date(sal.date).toLocaleDateString()}</div></td>
+                                    <td><div className="text-muted fw-700 small">{symbol}{sal.basicSalary?.toFixed(2)}</div></td>
+                                    <td><div className="text-muted small">{sal.otHours} hrs @ {symbol}{sal.otRate}</div></td>
+                                    <td><div className="text-primary fw-900">{symbol}{sal.total?.toFixed(2)}</div></td>
+                                    <td>
+                                        <div className="text-main small fw-700">{new Date(sal.date).toLocaleDateString()}</div>
+                                        <div className="tiny text-muted">Time: {new Date(sal.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                    </td>
                                 </tr>
-                            ))}
+                            )) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-5 opacity-40">
+                                        <FaHistory size={32} className="mb-2" />
+                                        <div className="fw-800">No historical payroll records</div>
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -213,6 +246,9 @@ const SalaryPage = () => {
         </div>
       </div>
 
+      <style>{`
+        .tiny { font-size: 0.7rem; }
+      `}</style>
     </div>
   );
 };

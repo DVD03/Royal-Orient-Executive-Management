@@ -165,7 +165,7 @@ const CashierLanding = () => {
                         {isIdentityExpanded ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
                     </div>
                     
-                    <div className="section-body p-4">
+                    <div className="section-body">
                         <div className="d-flex flex-column gap-3">
                             <div>
                                 <label className="stat-label mb-2 d-block">Contact Protocol</label>
@@ -198,7 +198,7 @@ const CashierLanding = () => {
                 </div>
 
                 {/* Cart Ledger */}
-                <div className="cart-ledger flex-grow-1 overflow-auto p-4">
+                <div className="cart-ledger flex-grow-1 overflow-auto p-3">
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <div className="d-flex align-items-center gap-2">
                             <div className="bg-gold-glow p-2 rounded-circle"><FaShoppingCart size={12} /></div>
@@ -235,7 +235,7 @@ const CashierLanding = () => {
                 </div>
 
                 {/* Execution Footer */}
-                <div className="execution-footer p-4 bg-app border-top">
+                <div className="execution-footer p-3 bg-app border-top">
                     <div className="d-flex justify-content-between mb-2">
                         <span className="text-muted fw-700 tiny">NET VALUATION</span>
                         <span className="text-main fw-800">{symbol}{subtotal.toFixed(2)}</span>

@@ -137,10 +137,10 @@ const ReceiptModal = ({ order, onClose }) => {
         <!-- ✅ SMALL CIRCULAR LOGO -->
         <div class="text-center mb-2">
           <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;margin:0 auto 4px;box-shadow:0 1px 2px rgba(0,0,0,0.1);">
-            <img src=${LogoImage} alt="Demo Resturant Logo" style="width:100%;height:100%;object-fit:cover;display:block;">
+            <img src=${LogoImage} alt="Royal Orient Logo" style="width:100%;height:100%;object-fit:cover;display:block;">
           </div>
         </div>
-          <h3 class="text-center" style=" font-size:20px; "><strong>Demo Resturant</strong></h3>
+          <h3 class="text-center" style=" font-size:20px; "><strong>Royal Orient</strong></h3>
           <p class="text-center mb-1" style=" font-size:12px; ">No. 14/2/D, Pugoda Road, Katulanda, Dekatana.</p>
           <p class="text-center mb-3" style=" font-size:15px; "><strong>0777122797</strong></p>
           <hr />
@@ -271,7 +271,7 @@ const ReceiptModal = ({ order, onClose }) => {
           >
             <img
               src={LogoImage}
-              alt="Demo Resturant Logo"
+              alt="Royal Orient Logo"
               style={{
                 width: '100%',
                 height: '100%',
@@ -283,7 +283,7 @@ const ReceiptModal = ({ order, onClose }) => {
         </div>
         {/* <h4 className="text-center mb-3">🍽️ <strong>Gasma Chinese Restaurant </strong></h4> */}
         {/* <h3 className="mb-0 fs-5" style={{ textAlign: "center" }} ><strong>Gasma</strong></h3> */}
-        <h3 className="mb-1 fs-4" style={{ textAlign: "center" }}><strong>Demo Resturant</strong></h3>
+        <h3 className="mb-1 fs-4" style={{ textAlign: "center" }}><strong>Royal Orient</strong></h3>
         <p className="mb-0" style={{ textAlign: "center", fontSize: "13px" }}> No. 14/2/D, Pugoda Road, Katulanda, Dekatana.</p>
         <p className="mb-3" style={{ textAlign: "center", fontSize: "14px" }}><strong>0777122797</strong></p>
         <hr style={{ margin: "10px 4px" }}/>

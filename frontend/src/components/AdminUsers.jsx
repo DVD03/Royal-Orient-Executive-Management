@@ -125,9 +125,7 @@ const AdminUsers = () => {
         </div>
       </div>
 
-      <style>{`
-        .tiny { font-size: 0.7rem; }
-      `}</style>
+
     </div>
   );
 };

@@ -15,13 +15,13 @@ const Home = () => {
           <div className="logo-ring">
             <img
               src={LogoImage}
-              alt="Demo Resturant Logo"
+              alt="Royal Orient Logo"
               className="logo-img"
             />
           </div>
         </div>
 
-        <h1 className="home-title">Demo Resturant</h1>
+        <h1 className="home-title">Royal Orient</h1>
         <p className="home-subtitle">Restaurant Management</p>
         
         <p className="signup-text" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "25px" }}>
@@ -55,7 +55,7 @@ const Home = () => {
         </div>
 
         <div className="footer-text">
-          © 2026 DEMO RESTURANT SYSTEM • PREMIER EDITION
+          © 2026 ROYAL ORIENT SYSTEM • PREMIER EDITION
         </div>
       </div>
     </div>

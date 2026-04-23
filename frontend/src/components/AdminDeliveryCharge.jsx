@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { motion } from "framer-motion";
-import { Truck, DollarSign, Settings, CheckCircle2, AlertCircle } from "lucide-react";
+import { FaTruck, FaDollarSign, FaExclamationCircle, FaDatabase, FaSave } from "react-icons/fa";
+import "../styles/PremiumUI.css";
 
 const AdminDeliveryCharge = () => {
   const [deliveryCharge, setDeliveryCharge] = useState({
@@ -10,6 +11,7 @@ const AdminDeliveryCharge = () => {
     isActive: false
   });
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchDeliveryCharge();
@@ -17,17 +19,17 @@ const AdminDeliveryCharge = () => {
 
   const fetchDeliveryCharge = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       const res = await axios.get(
         "https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/admin/delivery-charge",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setDeliveryCharge(res.data);
     } catch (err) {
-      console.error("Failed to load delivery charge:", err.message);
-      toast.error("Failed to load delivery charge");
+      toast.error("Cloud synchronization failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,7 +44,6 @@ const AdminDeliveryCharge = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
@@ -55,11 +56,10 @@ const AdminDeliveryCharge = () => {
           }
         }
       );
-
       setDeliveryCharge(res.data);
-      toast.success("Settings updated successfully");
+      toast.success("Governance logic updated");
     } catch (err) {
-      toast.error("Failed to update delivery charge");
+      toast.error("Operation failed");
     } finally {
       setSaving(false);
     }
@@ -67,187 +67,129 @@ const AdminDeliveryCharge = () => {
 
   const symbol = localStorage.getItem("currencySymbol") || "$";
 
+  if (loading) return (
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-white">
+        <div className="text-center">
+            <div className="spinner-border text-primary mb-3"></div>
+            <div className="fw-900 text-main">Syncing Logistic Parameters...</div>
+        </div>
+    </div>
+  );
+
   return (
-    <div className="admin-delivery-config">
-      <div className="container py-5">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-width-900 mx-auto"
-        >
-          {/* Header */}
-          <div className="d-flex align-items-center gap-4 mb-5">
-            <div className="p-3 rounded-4 glass-card text-jade-glow">
-              <Truck size={32} />
-            </div>
-            <div>
-              <h2 className="text-white fw-bold mb-1">Delivery Charge Settings</h2>
-              <p className="text-secondary m-0">Synchronize takeaway routing & pricing tier</p>
-            </div>
-          </div>
-
-          <div className="row g-4">
-            {/* Control Panel */}
-            <div className="col-lg-7">
-              <div className="glass-card p-4 h-100">
-                <div className="d-flex align-items-center gap-2 mb-4">
-                  <div className="p-2 rounded-lg bg-jade-soft text-jade">
-                    <Settings size={18} />
-                  </div>
-                  <h5 className="m-0 fw-bold text-white">Advanced Routing</h5>
-                </div>
-
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-4">
-                    <label className="text-secondary small fw-bold mb-2 letter-spacing-1">CHARGE PER TRIP ({symbol})</label>
-                    <div className="position-relative">
-                      <div className="position-absolute start-0 top-50 translate-middle-y ps-3 text-secondary">
-                        <DollarSign size={18} />
-                      </div>
-                      <input
-                        type="number"
-                        name="amount"
-                        value={deliveryCharge.amount}
-                        onChange={handleChange}
-                        min="0"
-                        step="0.1"
-                        className="form-control glass-panel border-white border-opacity-10 text-white p-3 ps-5 hover-jade"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="p-3 glass-panel rounded-4 border-white border-opacity-10 mb-4">
-                    <div className="d-flex align-items-center justify-content-between">
-                      <div>
-                        <h6 className="text-white fw-bold m-0">System Override</h6>
-                        <p className="text-secondary small m-0">Apply charge to all takeaway nodes</p>
-                      </div>
-                      <div className="form-check form-switch m-0">
-                        <input
-                          type="checkbox"
-                          id="isActive"
-                          name="isActive"
-                          checked={deliveryCharge.isActive}
-                          onChange={handleChange}
-                          className="form-check-input"
-                          style={{ width: '3em', height: '1.5em', cursor: 'pointer' }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    disabled={saving}
-                    className="save-btn w-100 py-3 rounded-4 fw-bold"
-                  >
-                    {saving ? "Synchronizing..." : "Update Vault Settings"}
-                  </motion.button>
-                </form>
-              </div>
-            </div>
-
-            {/* Status Hub */}
-            <div className="col-lg-5">
-              <div className="glass-card p-4 h-100">
-                <div className="d-flex align-items-center gap-2 mb-4">
-                  <div className="p-2 rounded-lg bg-gold-soft text-gold">
-                    <CheckCircle2 size={18} />
-                  </div>
-                  <h5 className="m-0 fw-bold text-white">Live Status</h5>
-                </div>
-
-                <div className="status-display mb-4">
-                  <div className="p-4 rounded-4 glass-panel text-center">
-                    <div className={`status-dot mx-auto mb-2 ${deliveryCharge.isActive ? 'active' : 'inactive'}`} />
-                    <h3 className="text-white fw-bold m-0">{deliveryCharge.isActive ? 'OPERATIONAL' : 'OFFLINE'}</h3>
-                    <p className="text-secondary small m-0 uppercase letter-spacing-2">Pricing Engine</p>
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-4 glass-panel border-info border-opacity-20 d-flex gap-3 align-items-start">
-                  <AlertCircle size={20} className="text-info" />
-                  <p className="text-secondary small m-0">
-                    When <strong>Operational</strong>, nodes will automatically calculate the {symbol}{deliveryCharge.amount.toFixed(2)} premium on checkout.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+    <div className="delivery-charge-layout animate-in p-2">
+      <ToastContainer theme="light" />
+      
+      <div className="d-flex justify-content-between align-items-end mb-5 flex-wrap gap-4">
+        <div>
+          <h1 className="premium-title">Logistic Governance</h1>
+          <p className="premium-subtitle">Configure delivery premiums and takeaway routing logic</p>
+        </div>
       </div>
 
-      <ToastContainer position="bottom-right" theme="dark" />
+      <div className="row g-4">
+        <div className="col-xl-5">
+            <div className="orient-card border-0 shadow-platinum bg-white p-5">
+                <div className="d-flex align-items-center gap-3 mb-5">
+                    <div className="bg-blue-glow p-3 rounded-circle"><FaTruck size={22} className="text-primary" /></div>
+                    <div>
+                        <h4 className="mb-0 fw-900 text-main">Logistic Parameter</h4>
+                        <p className="tiny text-muted mb-0 fw-700">CHARGE PER TRIP ({symbol})</p>
+                    </div>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="d-flex flex-column gap-4">
+                    <div className="col-12">
+                        <label className="stat-label mb-2 d-block">Premium Amount ({symbol})</label>
+                        <div className="position-relative">
+                            <FaDollarSign className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" size={14} />
+                            <input
+                              type="number"
+                              name="amount"
+                              value={deliveryCharge.amount}
+                              onChange={handleChange}
+                              min="0"
+                              step="0.1"
+                              className="premium-input bg-app border-0 ps-5 fw-900 text-primary fs-4"
+                              required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="col-12 p-4 bg-app rounded-4 border">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 className="fw-900 text-main mb-1">Routing Logic</h6>
+                                <p className="tiny text-muted mb-0 fw-600">Enable or suspend delivery charge</p>
+                            </div>
+                            <label className="switch">
+                              <input
+                                type="checkbox"
+                                name="isActive"
+                                checked={deliveryCharge.isActive}
+                                onChange={handleChange}
+                              />
+                              <span className="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" className="btn-premium btn-primary py-3 rounded-pill shadow-lg w-100 mt-4" disabled={saving}>
+                        <FaSave className="me-2" /> {saving ? "AUTHORIZING..." : "COMMIT GLOBAL CHANGE"}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div className="col-xl-7">
+            <div className="row g-4 mb-4">
+                <div className="col-md-6">
+                    <div className="orient-card stat-widget py-4 border-0 shadow-platinum bg-white">
+                        <div className="stat-icon bg-gold-glow"><FaDollarSign size={20} className="text-warning" /></div>
+                        <div>
+                            <div className="stat-label">Current Premium</div>
+                            <div className="stat-value">{symbol}{deliveryCharge.amount.toFixed(2)}</div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-6">
+                    <div className="orient-card stat-widget py-4 border-0 shadow-platinum bg-white">
+                        <div className="stat-icon bg-blue-glow"><FaDatabase size={20} /></div>
+                        <div>
+                            <div className="stat-label">Logistic Node</div>
+                            <div className="stat-value text-uppercase">{deliveryCharge.isActive ? "OPERATIONAL" : "SUSPENDED"}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="orient-card p-5 border-0 shadow-platinum bg-white">
+                <h5 className="fw-900 text-main mb-4">Live Operational Preview</h5>
+                <div className="p-4 bg-light rounded-4 border d-flex gap-4 align-items-start">
+                    <div className="bg-white p-3 rounded-circle shadow-sm"><FaExclamationCircle className="text-primary" /></div>
+                    <div>
+                        <p className="text-main fw-800 mb-1">Pricing Engine Logic</p>
+                        <p className="tiny text-muted fw-600 mb-0">
+                            When <strong>Operational</strong>, the system will automatically append a <strong>{symbol}{deliveryCharge.amount.toFixed(2)}</strong> logistic premium to all takeaway and delivery invoices processed at the terminal.
+                        </p>
+                    </div>
+                </div>
+                
+                <div className="mt-5 p-4 bg-app rounded-4 border border-dashed">
+                    <p className="tiny text-muted fw-700 mb-0">Security Note: Personnel must have administrative clearance to modify global logistic parameters.</p>
+                </div>
+            </div>
+        </div>
+      </div>
 
       <style>{`
-        .admin-delivery-config {
-          min-height: 80vh;
-          color: white;
-        }
-
-        .max-width-900 {
-            max-width: 900px;
-        }
-
-        .glass-card {
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 24px;
-        }
-
-        .glass-panel {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .text-jade-glow {
-          color: #10b981;
-          filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
-        }
-
-        .bg-jade-soft { background: rgba(16, 185, 129, 0.1); }
-        .text-jade { color: #10b981; }
-        
-        .bg-gold-soft { background: rgba(234, 179, 8, 0.1); }
-        .text-gold { color: #eab308; }
-
-        .letter-spacing-1 { letter-spacing: 1px; }
-        .letter-spacing-2 { letter-spacing: 2px; }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        .status-dot.active { background: #10b981; box-shadow: 0 0 15px #10b981; }
-        .status-dot.inactive { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
-
-        .save-btn {
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          color: white;
-          border: none;
-          box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-          transition: all 0.3s ease;
-        }
-
-        .save-btn:hover {
-          box-shadow: 0 12px 25px rgba(16, 185, 129, 0.5);
-          transform: translateY(-2px);
-        }
-
-        .hover-jade:focus {
-            border-color: rgba(16, 185, 129, 0.5) !important;
-            box-shadow: none;
-        }
-
-        .form-check-input:checked {
-            background-color: #10b981;
-            border-color: #10b981;
-        }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #e2e8f0; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .tiny { font-size: 0.7rem; }
       `}</style>
     </div>
   );
