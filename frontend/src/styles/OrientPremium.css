@@ -1,0 +1,204 @@
+/* src/styles/OrientPremium.css */
+
+:root {
+    --orient-bg: #023047;
+    --orient-card: rgba(255, 255, 255, 0.06);
+    --orient-sidebar: rgba(2, 48, 71, 0.95);
+    --orient-gold: #FFB703;
+    --orient-red: #D90429;
+    --orient-blue: #00B4D8;
+    --orient-text: #F1FAEE;
+    --orient-text-muted: rgba(241, 250, 238, 0.6);
+}
+
+.orient-root {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #023047 0%, #01161E 100%);
+    color: var(--orient-text);
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Sidebar Styling */
+.orient-sidebar {
+    width: 280px;
+    background: var(--orient-sidebar);
+    border-right: 1px solid rgba(255, 183, 3, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+    backdrop-filter: blur(20px);
+}
+
+.orient-sidebar.collapsed {
+    width: 80px;
+}
+
+.orient-sidebar-header {
+    padding: 30px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.orient-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    border: 2px solid var(--orient-gold);
+    box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
+}
+
+.orient-title {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #fff;
+    white-space: nowrap;
+    letter-spacing: 1px;
+}
+
+.orient-menu {
+    flex: 1;
+    padding: 20px 10px;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.orient-menu-item {
+    margin-bottom: 8px;
+}
+
+.orient-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 18px;
+    color: var(--orient-text-muted);
+    text-decoration: none;
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.orient-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.orient-link.active {
+    background: linear-gradient(135deg, var(--orient-red) 0%, #800000 100%);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(217, 4, 41, 0.3);
+}
+
+.orient-icon {
+    font-size: 1.3rem;
+    color: var(--orient-gold);
+}
+
+.orient-link.active .orient-icon {
+    color: #fff;
+}
+
+/* Main Content Area */
+.orient-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.orient-navbar {
+    height: 80px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(2, 48, 71, 0.5);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 90;
+}
+
+.orient-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.orient-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.orient-page-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    background: radial-gradient(circle at top right, rgba(217, 4, 41, 0.05), transparent 400px),
+                radial-gradient(circle at bottom left, rgba(0, 180, 216, 0.05), transparent 400px);
+}
+
+/* Premium UI Elements */
+.orient-card {
+    background: var(--orient-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.orient-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 25px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+}
+
+.orient-stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.orient-stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.orient-stat-label {
+    font-size: 0.85rem;
+    color: var(--orient-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

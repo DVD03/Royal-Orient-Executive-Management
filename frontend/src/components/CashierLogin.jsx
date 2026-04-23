@@ -2,7 +2,7 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { FaEnvelope, FaLock, FaArrowRight } from "react-icons/fa";
+import { FaUserCircle, FaUnlockAlt, FaArrowRight } from "react-icons/fa";
 import { AuthContext } from "../context/auth-context";
 import "./Login.css";
 
@@ -39,19 +39,19 @@ const CashierLogin = () => {
       <div className="login-bg-overlay"></div>
 
       <div className="login-glass-card">
-        <h2 className="login-card-title">Sign In</h2>
-        <span className="login-card-subtitle">Cashier Portal</span>
+        <h2 className="login-card-title">Cashier Portal</h2>
+        <span className="login-card-subtitle">Retail Management Interface</span>
 
         <form onSubmit={handleLogin}>
           <div className="login-input-group">
-            <label htmlFor="email">Email address</label>
+            <label htmlFor="email">Cashier Identity</label>
             <div className="login-input-wrapper">
-              <FaEnvelope className="login-input-icon" />
+              <FaUserCircle className="login-input-icon" />
               <input
                 type="email"
                 className="login-input-premium"
                 id="email"
-                placeholder="Enter your email"
+                placeholder="Enter email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -61,14 +61,14 @@ const CashierLogin = () => {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Security Pin</label>
             <div className="login-input-wrapper">
-              <FaLock className="login-input-icon" />
+              <FaUnlockAlt className="login-input-icon" />
               <input
                 type="password"
                 className="login-input-premium"
                 id="password"
-                placeholder="Enter your password"
+                placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -85,11 +85,11 @@ const CashierLogin = () => {
             {loading ? (
               <>
                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Logging in...
+                Authenticating...
               </>
             ) : (
               <>
-                Login <FaArrowRight />
+                Access Register <FaArrowRight />
               </>
             )}
           </button>
@@ -97,14 +97,14 @@ const CashierLogin = () => {
 
         <div className="login-footer">
           <p>
-            Don't have an account?{" "}
-            <Link to="/signup?role=cashier" className="premium-link">
-              Sign Up
+            Need help?{" "}
+            <Link to="/forgot-password" inclassName="link-gold">
+              Reset Password
             </Link>
           </p>
-          <p>
-            <Link to="/forgot-password" size="sm" className="premium-link">
-              Forgot Password?
+          <p style={{ marginTop: "10px" }}>
+            <Link to="/" className="link-gold">
+              Return to Home
             </Link>
           </p>
         </div>

@@ -2,7 +2,7 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { FaEnvelope, FaLock, FaArrowRight } from "react-icons/fa";
+import { FaUtensils, FaLock, FaArrowRight } from "react-icons/fa";
 import { AuthContext } from "../context/auth-context";
 import "./Login.css";
 
@@ -42,19 +42,19 @@ const KitchenLogin = () => {
       <div className="login-bg-overlay"></div>
 
       <div className="login-glass-card">
-        <h2 className="login-card-title">Sign In</h2>
-        <span className="login-card-subtitle">Kitchen Portal</span>
+        <h2 className="login-card-title">Kitchen Ops</h2>
+        <span className="login-card-subtitle">Back-of-House Management</span>
 
         <form onSubmit={handleLogin}>
           <div className="login-input-group">
-            <label htmlFor="email">Email address</label>
+            <label htmlFor="email">Staff Identity</label>
             <div className="login-input-wrapper">
-              <FaEnvelope className="login-input-icon" />
+              <FaUtensils className="login-input-icon" />
               <input
                 type="email"
                 className="login-input-premium"
                 id="email"
-                placeholder="Enter your email"
+                placeholder="Enter staff email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -64,14 +64,14 @@ const KitchenLogin = () => {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Station Key</label>
             <div className="login-input-wrapper">
               <FaLock className="login-input-icon" />
               <input
                 type="password"
                 className="login-input-premium"
                 id="password"
-                placeholder="Enter your password"
+                placeholder="Enter station key"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -88,11 +88,11 @@ const KitchenLogin = () => {
             {loading ? (
               <>
                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Logging in...
+                Verifying...
               </>
             ) : (
               <>
-                Login <FaArrowRight />
+                Enter Kitchen <FaArrowRight />
               </>
             )}
           </button>
@@ -100,14 +100,11 @@ const KitchenLogin = () => {
 
         <div className="login-footer">
           <p>
-            Don't have an account?{" "}
-            <Link to="/signup?role=kitchen" className="premium-link">
-              Sign Up
-            </Link>
+            Authorized personnel only.
           </p>
-          <p>
-            <Link to="/forgot-password" size="sm" className="premium-link">
-              Forgot Password?
+          <p style={{ marginTop: "15px" }}>
+            <Link to="/" className="link-gold">
+              Return to Site
             </Link>
           </p>
         </div>

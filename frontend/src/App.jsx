@@ -1,6 +1,7 @@
 // App.jsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import './styles/PremiumUI.css';
 import Home from './components/Home';
 import AdminLogin from './components/AdminLogin';
 import CashierLogin from './components/CashierLogin';

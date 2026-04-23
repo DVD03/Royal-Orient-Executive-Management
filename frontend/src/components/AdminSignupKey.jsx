@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Key, 
-  Plus, 
-  Trash2, 
-  Copy, 
-  Check, 
-  ShieldCheck, 
-  AlertCircle,
-  CopyCheck,
-  RefreshCw
-} from "lucide-react";
+import { FaKey, FaPlus, FaTrash, FaCopy, FaCheck, FaShieldAlt, FaHistory, FaSyncAlt } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../styles/PremiumUI.css";
 
 const AdminSignupKey = () => {
   const [keys, setKeys] = useState([]);
@@ -19,7 +12,6 @@ const AdminSignupKey = () => {
   const [generating, setGenerating] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
 
-  // Load keys
   useEffect(() => {
     fetchKeys();
   }, []);
@@ -31,242 +23,121 @@ const AdminSignupKey = () => {
       const res = await axios.get("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/signup-keys", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setKeys(res.data);
+      setKeys(res.data || []);
     } catch (err) {
-      console.error("Failed to load keys:", err);
+      toast.error("Vault synchronization failed");
     } finally {
       setLoading(false);
     }
   };
 
-  // Generate new key
   const generateKey = async () => {
     setGenerating(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/generate-key",
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await axios.post("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/generate-key", {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setKeys([...keys, res.data]);
+      toast.success("New Authority Token minted");
     } catch (err) {
-      console.error("Failed to generate key:", err);
+      toast.error("Key generation failed");
     } finally {
       setGenerating(false);
     }
   };
 
-  // Delete key
   const deleteKey = async (id) => {
+    if (!window.confirm("Revoke this authority token?")) return;
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/signup-key/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setKeys(keys.filter((key) => key._id !== id));
+      setKeys(keys.filter((k) => k._id !== id));
+      toast.success("Token revoked");
     } catch (err) {
-      console.error("Failed to delete key:", err);
+      toast.error("Revocation failed");
     }
   };
 
   const copyToClipboard = (text, id) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
+    toast.info("Token copied to clipboard");
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
-
-  const cardVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 }
-  };
-
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="admin-signup-key-page container py-5"
-    >
-      {/* Header Section */}
-      <div className="text-center mb-5">
-         <motion.div 
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="d-inline-flex p-3 rounded-circle glass-panel mb-4 text-jade-glow animate-float"
-         >
-            <ShieldCheck size={48} />
-         </motion.div>
-         <h1 className="fw-bold mb-1 display-5 ask-page-title">Authority Signup Keys</h1>
-         <p className="text-secondary fs-5 ask-page-subtitle">Secure account generation tokens & management</p>
+    <div className="signup-key-container animate-fade-in">
+      <ToastContainer theme="dark" />
+      
+      <div className="d-flex justify-content-between align-items-end mb-5 flex-wrap gap-4">
+        <div>
+          <h1 className="premium-title mb-1">Authority Vault</h1>
+          <p className="premium-subtitle mb-0">Generate and manage secure registration tokens for staff onboarding</p>
+        </div>
       </div>
 
-      {/* Action Area */}
-      <div className="d-flex justify-content-center mb-5">
-        <motion.button 
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="p-3 px-5 glass-card d-flex align-items-center gap-3 hover-jade border-jade"
-          onClick={generateKey}
-          disabled={generating}
-        >
-          {generating ? <RefreshCw className="animate-spin" size={24} /> : <Plus size={24} className="text-jade-glow" />}
-          <span className="fw-bold fs-5">{generating ? "Generating..." : "Generate Authority Token"}</span>
-        </motion.button>
-      </div>
-
-      <AnimatePresence mode="popLayout">
-        {loading ? (
-          <motion.div 
-            key="loader"
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }}
-            className="text-center py-5"
-          >
-             <div className="spinner-border text-jade" role="status" />
-          </motion.div>
-        ) : keys.length === 0 ? (
-          <motion.div 
-            key="empty"
-            variants={cardVariants}
-            className="glass-card p-5 text-center max-w-lg mx-auto"
-          >
-            <AlertCircle size={64} className="text-secondary opacity-25 mb-4" />
-            <h3 className="fw-bold mb-2 ask-page-title">Safe Vault Empty</h3>
-            <p className="text-secondary mb-0">No active signup keys found. Generate a new token above to authorize staff registration.</p>
-          </motion.div>
-        ) : (
-          <div className="row g-4 justify-content-center">
-            {keys.map((key) => (
-              <motion.div 
-                layout
-                key={key._id}
-                variants={cardVariants}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="col-xl-6 col-lg-8"
-              >
-                <div className="glass-card p-4 d-flex align-items-center justify-content-between gap-4">
-                  <div className="d-flex align-items-center gap-4 flex-grow-1 overflow-hidden">
-                    <div className="p-3 rounded-4 glass-panel text-gold">
-                      <Key size={24} />
-                    </div>
-                    <div className="overflow-hidden">
-                       <small className="text-secondary d-block mb-1 text-uppercase letter-spacing-1">Vault Key</small>
-                       <code className="fs-5 fw-medium text-break ask-key-code">{key.key}</code>
-                    </div>
-                  </div>
-
-                  <div className="d-flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => copyToClipboard(key.key, key._id)}
-                      className={`btn-action rounded-circle p-3 glass-panel border-0 ${copiedId === key._id ? 'text-jade-glow' : 'text-secondary hover-text-white'}`}
-                      title="Copy to clipboard"
-                    >
-                      {copiedId === key._id ? <CopyCheck size={20} /> : <Copy size={20} />}
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.1, backgroundColor: 'hsla(0, 100%, 50%, 0.1)' }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => deleteKey(key._id)}
-                      className="btn-action rounded-circle p-3 glass-panel border-0 text-danger hover-text-danger"
-                      title="Revoke key"
-                    >
-                      <Trash2 size={20} />
-                    </motion.button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+      {/* Main Action Card */}
+      <div className="premium-card p-5 text-center mb-5 orient-card-glass">
+          <div className="bg-gold-glow d-inline-block p-4 rounded-circle mb-4">
+              <FaShieldAlt className="text-gold" size={48} />
           </div>
-        )}
-      </AnimatePresence>
+          <h2 className="text-white mb-3 h3">Mint New Authority Token</h2>
+          <p className="orient-text-muted mb-4 mx-auto" style={{maxWidth: '500px'}}>Tokens are required for new staff to register accounts. Revoke unused tokens to maintain system integrity.</p>
+          <button className="btn-premium btn-premium-secondary px-5 py-3" onClick={generateKey} disabled={generating}>
+              {generating ? <><FaSyncAlt className="animate-spin me-2" /> Forging Token...</> : <><FaPlus className="me-2" /> Generate Token</>}
+          </button>
+      </div>
+
+      {/* Keys List */}
+      <div className="orient-card p-0 overflow-hidden">
+        <div className="p-4 border-bottom border-white-05 d-flex justify-content-between align-items-center">
+            <h5 className="text-white mb-0"><FaHistory className="me-2 text-gold" /> Active Authority Tokens</h5>
+            <span className="badge-premium badge-primary">{keys.length} Active Keys</span>
+        </div>
+        
+        <div className="p-4">
+            {loading ? (
+                <div className="text-center py-5"><div className="spinner-border text-gold"></div></div>
+            ) : keys.length === 0 ? (
+                <div className="text-center py-5 orient-text-muted">No active tokens found in the vault.</div>
+            ) : (
+                <div className="row g-4">
+                    {keys.map((k) => (
+                        <div key={k._id} className="col-lg-6">
+                            <div className="premium-card p-3 d-flex align-items-center justify-content-between bg-white-05 border-white-05">
+                                <div className="d-flex align-items-center gap-3 overflow-hidden">
+                                    <div className="bg-gold-glow p-3 rounded-3"><FaKey className="text-gold" /></div>
+                                    <div className="overflow-hidden">
+                                        <div className="orient-stat-label mb-1">Vault Key</div>
+                                        <code className="text-gold h5 mb-0 d-block text-truncate" style={{letterSpacing: '1px'}}>{k.key}</code>
+                                    </div>
+                                </div>
+                                <div className="d-flex gap-2">
+                                    <button className="btn-premium btn-premium-primary p-2" onClick={() => copyToClipboard(k.key, k._id)}>
+                                        {copiedId === k._id ? <FaCheck className="text-success" /> : <FaCopy />}
+                                    </button>
+                                    <button className="btn-premium btn-premium-primary p-2 text-danger" onClick={() => deleteKey(k._id)}>
+                                        <FaTrash />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+      </div>
 
       <style>{`
-        .admin-signup-key-page .ask-page-title {
-          color: #0f172a;
-        }
-
-        .admin-signup-key-page .ask-page-subtitle {
-          color: #64748b !important;
-          opacity: 1 !important;
-        }
-
-        .admin-signup-key-page .glass-panel {
-          background: #f8fafc !important;
-          border: 1px solid rgba(15, 23, 42, 0.1) !important;
-          backdrop-filter: none !important;
-          -webkit-backdrop-filter: none !important;
-        }
-
-        .admin-signup-key-page .glass-card {
-          background: #ffffff !important;
-          border: 1px solid rgba(15, 23, 42, 0.1) !important;
-          backdrop-filter: none !important;
-          -webkit-backdrop-filter: none !important;
-          box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08) !important;
-        }
-
-        .admin-signup-key-page .glass-card:hover {
-          background: #ffffff !important;
-          border-color: hsla(160, 42%, 38%, 0.4) !important;
-          box-shadow: 0 22px 48px rgba(15, 23, 42, 0.1) !important;
-        }
-
-        .admin-signup-key-page .text-jade-glow,
-        .admin-signup-key-page .text-jade {
-          color: #059669 !important;
-        }
-
-        .admin-signup-key-page .border-jade {
-          border-width: 2px !important;
-          border-color: hsla(160, 42%, 38%, 0.45) !important;
-        }
-
-        .admin-signup-key-page .hover-jade:hover {
-          border-color: hsla(160, 42%, 34%, 0.65) !important;
-        }
-
-        .admin-signup-key-page .glass-card .fw-bold.fs-5 {
-          color: #0f172a !important;
-        }
-
-        .admin-signup-key-page .ask-key-code {
-          color: #0f172a !important;
-          background: #f1f5f9;
-          padding: 0.2rem 0.5rem;
-          border-radius: 0.4rem;
-          border: 1px solid rgba(15, 23, 42, 0.08);
-        }
-
-        .admin-signup-key-page .text-gold {
-          color: #b45309 !important;
-        }
-
-        .admin-signup-key-page .hover-text-white:hover {
-          color: #0f172a !important;
-        }
-
-        .admin-signup-key-page .text-secondary.opacity-25 {
-          color: #94a3b8 !important;
-          opacity: 1 !important;
-        }
-
-        .admin-signup-key-page .text-secondary:not(.opacity-25) {
-          color: #64748b !important;
-        }
+        .bg-gold-glow { background: rgba(255, 183, 3, 0.1); }
+        .border-white-05 { border-color: rgba(255,255,255,0.05) !important; }
+        .bg-white-05 { background: rgba(255,255,255,0.05); }
+        .orient-card-glass { background: rgba(2, 48, 71, 0.4) !important; backdrop-filter: blur(20px); border: 1px solid rgba(255, 183, 3, 0.1); }
       `}</style>
-    </motion.div>
+    </div>
   );
 };
 

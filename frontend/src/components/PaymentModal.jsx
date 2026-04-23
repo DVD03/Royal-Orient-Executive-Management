@@ -1,400 +1,143 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { FaMoneyBillWave, FaCreditCard, FaUniversity, FaTimes, FaCheckCircle, FaBackspace } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
+import "../styles/PremiumUI.css";
 
-const PaymentModal = ({ totalAmount, onConfirm, onClose, loading = false }) => {
-  const [cash, setCash] = useState(parseFloat(totalAmount) || 0);
+const PaymentModal = ({ orderData, onSubmit, handleClose, symbol = "$" }) => {
+  const totalAmount = orderData?.totalPrice || 0;
+  const [cash, setCash] = useState(totalAmount);
   const [card, setCard] = useState(0);
-  const [bankTransfer, setBankTransfer] = useState(0);
+  const [bank, setBank] = useState(0);
   const [notes, setNotes] = useState("");
-  const [numberPadTarget, setNumberPadTarget] = useState(null);
-  const [showNumberPad, setShowNumberPad] = useState(false);
-  const [useOtherPaymentMethods, setUseOtherPaymentMethods] = useState(false); // 👈 NEW
+  const [activeField, setActiveField] = useState("cash");
 
-  // Reset card & bank when disabling other methods
-  const toggleOtherPayments = () => {
-    const newValue = !useOtherPaymentMethods;
-    setUseOtherPaymentMethods(newValue);
-    if (!newValue) {
-      setCard(0);
-      setBankTransfer(0);
+  const totalPaid = parseFloat(cash || 0) + parseFloat(card || 0) + parseFloat(bank || 0);
+  const changeDue = Math.max(0, totalPaid - totalAmount);
+
+  const handleNumPad = (val) => {
+    let current = activeField === "cash" ? cash : activeField === "card" ? card : bank;
+    current = String(current);
+    
+    if (val === "back") {
+      current = current.slice(0, -1) || "0";
+    } else if (val === ".") {
+      if (!current.includes(".")) current += ".";
+    } else {
+      current = current === "0" ? String(val) : current + val;
     }
+
+    const num = parseFloat(current) || 0;
+    if (activeField === "cash") setCash(current);
+    else if (activeField === "card") setCard(current);
+    else setBank(current);
   };
 
-  const totalPaid = (parseFloat(cash) || 0) + 
-                    (useOtherPaymentMethods ? (parseFloat(card) || 0) : 0) + 
-                    (useOtherPaymentMethods ? (parseFloat(bankTransfer) || 0) : 0);
-  const changeDue = Math.max(0, totalPaid - totalAmount).toFixed(2);
-
-  const handleSubmit = () => {
+  const handleConfirm = () => {
     if (totalPaid < totalAmount) {
-      toast.warn("Total paid must be equal or greater than order total");
+      toast.error("Insufficient payment amount!");
       return;
     }
-    onConfirm({ 
-      cash, 
-      card: useOtherPaymentMethods ? card : 0, 
-      bankTransfer: useOtherPaymentMethods ? bankTransfer : 0, 
-      totalPaid, 
-      changeDue, 
-      notes 
+    onSubmit({
+      cash: parseFloat(cash),
+      card: parseFloat(card),
+      bankTransfer: parseFloat(bank),
+      totalPaid,
+      changeDue,
+      notes
     });
   };
 
-  // Handle manual keyboard input
-  const handleInputChange = (field, value) => {
-    // Allow empty, digits, and one decimal point
-    if (value === '' || /^(\d*\.?\d*)$/.test(value)) {
-      const numValue = value === '' ? 0 : parseFloat(value);
-      if (field === 'cash') setCash(numValue || 0);
-      else if (field === 'card') setCard(numValue || 0);
-      else setBankTransfer(numValue || 0);
-    }
-  };
-
-  // Number pad handlers
-  const handleNumberPadInput = (value) => {
-    if (!numberPadTarget) return;
-
-    const current = String(
-      numberPadTarget === 'cash' ? (cash || 0) :
-      numberPadTarget === 'card' ? (card || 0) : (bankTransfer || 0)
-    ).replace(/^0+/, '') || '0';
-
-    let newValue;
-    if (value === '.') {
-      if (!current.includes('.')) newValue = current + '.';
-      else return;
-    } else {
-      if (current === '0' && !current.includes('.')) {
-        newValue = value;
-      } else {
-        newValue = current + value;
-      }
-    }
-
-    const numValue = parseFloat(newValue) || 0;
-    if (numberPadTarget === 'cash') setCash(numValue);
-    else if (numberPadTarget === 'card') setCard(numValue);
-    else setBankTransfer(numValue);
-  };
-
-  const handleClear = () => {
-    if (!numberPadTarget) return;
-
-    if (numberPadTarget === 'cash') setCash(0);
-    else if (numberPadTarget === 'card') setCard(0);
-    else setBankTransfer(0);
-  };
-
-  const handleBackspace = () => {
-    if (!numberPadTarget) return;
-
-    const current = String(
-      numberPadTarget === 'cash' ? (cash || 0) :
-      numberPadTarget === 'card' ? (card || 0) : (bankTransfer || 0)
-    );
-
-    if (current.length <= 1 || (current === '0.')) {
-      if (numberPadTarget === 'cash') setCash(0);
-      else if (numberPadTarget === 'card') setCard(0);
-      else setBankTransfer(0);
-    } else {
-      const newValue = current.slice(0, -1);
-      const numValue = parseFloat(newValue) || 0;
-      if (numberPadTarget === 'cash') setCash(numValue);
-      else if (numberPadTarget === 'card') setCard(numValue);
-      else setBankTransfer(numValue);
-    }
-  };
-
-  const handleDecimal = () => {
-    if (!numberPadTarget) return;
-    const current = String(
-      numberPadTarget === 'cash' ? (cash || 0) :
-      numberPadTarget === 'card' ? (card || 0) : (bankTransfer || 0)
-    );
-    if (!current.includes('.')) {
-      handleNumberPadInput('.');
-    }
-  };
-
-  const focusField = (field) => {
-    setNumberPadTarget(field);
-    setShowNumberPad(true);
-  };
-
-  const symbol = localStorage.getItem("currencySymbol") || "$";
-
   return (
-    <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-      <div className="modal-dialog modal-xl">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Record Payment</h5>
-            <button className="btn-close" onClick={onClose}></button>
-          </div>
-          <div className="modal-body">
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <h4>Order Total: <strong>{symbol}{totalAmount.toFixed(2)}</strong></h4>
-              </div>
-              <div className="col-md-6 text-end">
-                <h4>Total Paid: <strong>{symbol}{totalPaid.toFixed(2)}</strong></h4>
-              </div>
-            </div>
+    <div className="premium-modal-overlay">
+      <div className="premium-modal" style={{ maxWidth: '900px' }}>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+            <h3 className="premium-title mb-0">Authorize Transaction</h3>
+            <button className="btn-premium btn-premium-primary p-2 rounded-circle" onClick={handleClose}><FaTimes /></button>
+        </div>
 
-            <hr />
-
-            <div className="row g-4">
-              {/* Left: Inputs */}
-              <div className="col-md-7">
-                <div className="row g-3">
-                  <div className="col-md-4">
-                    <label className="form-label">Cash ({symbol})</label>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={cash === 0 ? '' : cash}
-                      onChange={(e) => handleInputChange('cash', e.target.value)}
-                      onFocus={() => focusField('cash')}
-                      className="form-control text-end"
-                      placeholder="0.00"
-                    />
-                  </div>
-                  {useOtherPaymentMethods && (
-                    <>
-                      <div className="col-md-4">
-                        <label className="form-label">Card ({symbol})</label>
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          value={card === 0 ? '' : card}
-                          onChange={(e) => handleInputChange('card', e.target.value)}
-                          onFocus={() => focusField('card')}
-                          className="form-control text-end"
-                          placeholder="0.00"
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Bank Transfer ({symbol})</label>
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          value={bankTransfer === 0 ? '' : bankTransfer}
-                          onChange={(e) => handleInputChange('bankTransfer', e.target.value)}
-                          onFocus={() => focusField('bankTransfer')}
-                          className="form-control text-end"
-                          placeholder="0.00"
-                        />
-                      </div>
-                    </>
-                  )}
-                  {/* Checkbox to toggle other methods */}
-                  <div className="col-md-12 mt-2">
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="otherPayments"
-                        checked={useOtherPaymentMethods}
-                        onChange={toggleOtherPayments}
-                      />
-                      <label className="form-check-label" htmlFor="otherPayments">
-                        Use other payment methods (Card / Bank Transfer)
-                      </label>
-                    </div>
-                  </div>
+        <div className="row g-4">
+            {/* Left: Inputs */}
+            <div className="col-md-6">
+                <div className="orient-card mb-4 p-4 border-gold">
+                    <div className="orient-stat-label mb-2">Order Total</div>
+                    <div className="orient-stat-value text-gold" style={{ fontSize: '2.5rem' }}>{symbol}{totalAmount.toLocaleString()}</div>
                 </div>
 
-                <div className="mt-3">
-                  <label className="form-label">Notes (Optional)</label>
-                  <textarea
+                <div className="d-flex flex-column gap-3 mb-4">
+                    <div className={`orient-card p-3 d-flex align-items-center gap-3 cursor-pointer ${activeField === 'cash' ? 'active-field' : ''}`} onClick={() => setActiveField('cash')}>
+                        <FaMoneyBillWave className={activeField === 'cash' ? 'text-gold' : 'text-muted'} />
+                        <div className="flex-grow-1">
+                            <div className="orient-stat-label" style={{ fontSize: '0.6rem' }}>Cash Payment</div>
+                            <div className="fw-bold">{symbol}{cash}</div>
+                        </div>
+                    </div>
+                    <div className={`orient-card p-3 d-flex align-items-center gap-3 cursor-pointer ${activeField === 'card' ? 'active-field' : ''}`} onClick={() => setActiveField('card')}>
+                        <FaCreditCard className={activeField === 'card' ? 'text-gold' : 'text-muted'} />
+                        <div className="flex-grow-1">
+                            <div className="orient-stat-label" style={{ fontSize: '0.6rem' }}>Card Transaction</div>
+                            <div className="fw-bold">{symbol}{card}</div>
+                        </div>
+                    </div>
+                    <div className={`orient-card p-3 d-flex align-items-center gap-3 cursor-pointer ${activeField === 'bank' ? 'active-field' : ''}`} onClick={() => setActiveField('bank')}>
+                        <FaUniversity className={activeField === 'bank' ? 'text-gold' : 'text-muted'} />
+                        <div className="flex-grow-1">
+                            <div className="orient-stat-label" style={{ fontSize: '0.6rem' }}>Bank Transfer</div>
+                            <div className="fw-bold">{symbol}{bank}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="orient-card p-3 bg-success-glow">
+                    <div className="d-flex justify-content-between">
+                        <span className="orient-stat-label">Change Due</span>
+                        <span className="fw-bold text-success">{symbol}{changeDue.toLocaleString()}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right: NumPad */}
+            <div className="col-md-6">
+                <div className="numpad-grid-premium">
+                    {[1,2,3,4,5,6,7,8,9,'.',0,'back'].map(v => (
+                        <button key={v} className="numpad-btn" onClick={() => handleNumPad(v)}>
+                            {v === 'back' ? <FaBackspace /> : v}
+                        </button>
+                    ))}
+                </div>
+                <textarea 
+                    className="premium-input mt-4" 
+                    placeholder="Transaction notes (optional)..." 
                     rows="2"
-                    className="form-control"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                  />
-                </div>
-
-                <div className="mt-3">
-                  <h5>
-                    Change Due: <span className="text-success">{symbol}{changeDue}</span>
-                  </h5>
-                </div>
-
-                <div className="mt-4 d-flex justify-content-between">
-                  <button 
-                    className="btn btn-secondary" 
-                    onClick={onClose}
-                    disabled={loading}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="btn btn-success" 
-                    onClick={handleSubmit}
-                    disabled={loading} // ✅ disable during submit
-                  >
-                    {loading ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Processing...
-                      </>
-                    ) : (
-                      "Confirm Payment"
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Right: Number Pad */}
-              <div className="col-md-5">
-                {showNumberPad ? (
-                  <div>
-                    <div className="d-flex justify-content-between mb-2">
-                      <small>Enter amount for {numberPadTarget}</small>
-                      <button className="btn btn-sm btn-outline-secondary" onClick={() => setShowNumberPad(false)}>
-                        ✕
-                      </button>
-                    </div>
-                    <div className="bg-light p-3 rounded shadow-sm">
-                      <div className="row g-2">
-                        {/* Row 1 */}
-                        <div className="col-6">
-                          <button
-                            className="btn btn-outline-danger w-100 py-2 border"
-                            onClick={handleClear}
-                          >
-                            C
-                          </button>
-                        </div>
-                        <div className="col-6">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={handleBackspace}
-                          >
-                            ⌫
-                          </button>
-                        </div>
-
-                        {/* Row 2 */}
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('7')}
-                          >
-                            7
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('8')}
-                          >
-                            8
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('9')}
-                          >
-                            9
-                          </button>
-                        </div>
-
-                        {/* Row 3 */}
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('4')}
-                          >
-                            4
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('5')}
-                          >
-                            5
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('6')}
-                          >
-                            6
-                          </button>
-                        </div>
-
-                        {/* Row 4 */}
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('1')}
-                          >
-                            1
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('2')}
-                          >
-                            2
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('3')}
-                          >
-                            3
-                          </button>
-                        </div>
-
-                        {/* Row 5 */}
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={() => handleNumberPadInput('0')}
-                          >
-                            0
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button
-                            className="btn btn-light w-100 py-2 border"
-                            onClick={handleDecimal}
-                          >
-                            .
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button
-                            className="btn btn-success w-100 py-2"
-                            onClick={() => setShowNumberPad(false)}
-                          >
-                            Done
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-muted small d-flex align-items-center" style={{ height: '200px' }}>
-                    Tap any amount field to open number pad
-                  </div>
-                )}
-              </div>
+                />
+                <button className="btn-premium btn-premium-secondary w-100 mt-4 py-3 fs-5" onClick={handleConfirm}>
+                    <FaCheckCircle className="me-2" /> Complete Checkout
+                </button>
             </div>
-          </div>
         </div>
+
+        <style>{`
+            .border-gold { border-color: var(--orient-gold) !important; }
+            .bg-success-glow { background: rgba(0, 255, 127, 0.1); border: 1px solid rgba(0, 255, 127, 0.2); }
+            .active-field { background: rgba(255, 183, 3, 0.1) !important; border-color: var(--orient-gold) !important; }
+            .cursor-pointer { cursor: pointer; }
+            .numpad-grid-premium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .numpad-btn { 
+                background: rgba(255,255,255,0.05); 
+                border: 1px solid rgba(255,255,255,0.1); 
+                color: #fff; 
+                height: 70px; 
+                border-radius: 16px; 
+                font-size: 1.5rem; 
+                font-weight: 600; 
+                transition: all 0.2s; 
+            }
+            .numpad-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+            .numpad-btn:active { transform: scale(0.95); }
+        `}</style>
       </div>
-      <ToastContainer />
     </div>
   );
 };

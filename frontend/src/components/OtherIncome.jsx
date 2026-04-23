@@ -1,910 +1,205 @@
-// src/components/OtherIncome.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaCoins } from "react-icons/fa";
+import { FaCoins, FaHistory, FaPlus, FaSave, FaTrash, FaEdit, FaCreditCard, FaMoneyBillWave, FaDonate } from "react-icons/fa";
+import "../styles/PremiumUI.css";
 
 const OtherIncome = () => {
   const [incomes, setIncomes] = useState([]);
-  const [newIncome, setNewIncome] = useState({
+  const [formData, setFormData] = useState({
     source: "Tips",
     amount: "",
     description: "",
     date: new Date().toISOString().split("T")[0],
     paymentMethod: "Cash"
   });
-
-  const [editingIncome, setEditingIncome] = useState(null);
-  const [editData, setEditData] = useState({ ...newIncome });
+  const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const symbol = localStorage.getItem("currencySymbol") || "$";
 
   useEffect(() => {
     fetchIncomes();
   }, []);
 
   const fetchIncomes = async () => {
+    setLoading(true);
     const token = localStorage.getItem("token");
-
     try {
-      setLoading(true);
-      const res = await axios.get(
-        "https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/income/other",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-
-      setIncomes(res.data);
+      const res = await axios.get("https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/income/other", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setIncomes(res.data || []);
     } catch (err) {
-      console.error("Failed to load incomes:", err.message);
-      toast.error("Failed to load other income records");
+      toast.error("Failed to sync revenue records");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) =>
-    setNewIncome({ ...newIncome, [e.target.name]: e.target.value });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const { source, amount, date } = newIncome;
-
-    if (!source || !amount || !date) {
-      alert("Source, Amount, and Date are required");
+    if (!formData.amount || !formData.date) {
+      toast.error("Required fields missing");
       return;
     }
-
+    setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/income/other",
-        newIncome,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      setIncomes([res.data, ...incomes]);
-      setNewIncome({
-        source: "Tips",
-        amount: "",
-        description: "",
-        date: new Date().toISOString().split("T")[0],
-        paymentMethod: "Cash"
+      const url = editingId 
+        ? `https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/income/other/${editingId}`
+        : "https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/income/other";
+      
+      await axios[editingId ? 'put' : 'post'](url, formData, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-
-      toast.success("Income added successfully!");
+      
+      toast.success(editingId ? "Revenue record updated" : "Miscellaneous income logged");
+      setFormData({ source: "Tips", amount: "", description: "", date: new Date().toISOString().split("T")[0], paymentMethod: "Cash" });
+      setEditingId(null);
+      fetchIncomes();
     } catch (err) {
-      console.error("Add failed:", err.response?.data || err.message);
-      toast.error("Failed to add income");
-    }
-  };
-
-  const symbol = localStorage.getItem("currencySymbol") || "$";
-
-  const openEditModal = (income) => {
-    setEditingIncome(income._id);
-    setEditData({
-      source: income.source,
-      amount: income.amount,
-      description: income.description,
-      date: new Date(income.date).toISOString().split("T")[0],
-      paymentMethod: income.paymentMethod || "Cash"
-    });
-  };
-
-  const handleEditChange = (e) =>
-    setEditData({ ...editData, [e.target.name]: e.target.value });
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-
-    const { source, amount, date } = editData;
-
-    if (!source || !amount || !date) {
-      alert("All fields are required");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.put(
-        `https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/income/other/${editingIncome}`,
-        editData,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-
-      setIncomes(incomes.map((i) => (i._id === editingIncome ? res.data : i)));
-      setEditingIncome(null);
-      toast.success("Income updated!");
-    } catch (err) {
-      console.error("Update failed:", err.response?.data || err.message);
-      toast.error("Failed to update income");
+      toast.error("Transaction failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this income record?"
-    );
-    if (!confirmDelete) return;
-
+    if (!window.confirm("Delete this revenue record?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(
-        `https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/income/other/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-
-      setIncomes(incomes.filter((income) => income._id !== id));
-      toast.success("Income record deleted");
+      await axios.delete(`https://gasmachineserestaurantapp-7aq4.onrender.com/api/auth/income/other/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setIncomes(incomes.filter(i => i._id !== id));
+      toast.success("Record purged");
     } catch (err) {
-      console.error("Delete failed:", err.response?.data || err.message);
-      toast.error("Failed to delete income record");
+      toast.error("Deletion failed");
     }
   };
 
   return (
-    <div className="other-income-page">
-      <div className="page-glow glow-1"></div>
-      <div className="page-glow glow-2"></div>
-      <div className="page-grid"></div>
-
-      <div className="page-shell">
-        <div className="hero-card shared-card-surface">
-          <span className="hero-badge">Income Management</span>
-          <h1 className="hero-title">Other Income</h1>
-          <p className="hero-subtitle">
-            Record and manage non-sales income in a clean, modern admin interface.
-          </p>
-        </div>
-
-        <div className="stack-layout">
-          <div className="glass-card shared-card-surface form-card">
-            <div className="section-header">
-              <h2 className="section-title">Add Income</h2>
-              <p className="section-subtitle">
-                Enter income details and keep additional revenue records organized.
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="form-grid">
-                <div className="field-block">
-                  <label className="form-label">Income Source</label>
-                  <select
-                    name="source"
-                    value={newIncome.source}
-                    onChange={handleChange}
-                    className="form-control custom-input custom-select"
-                  >
-                    <option>Tips</option>
-                    <option>Event Rental</option>
-                    <option>Merchandise</option>
-                    <option>Delivery Fee</option>
-                    <option>Donations</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-
-                <div className="field-block">
-                  <label className="form-label">Amount ({symbol})</label>
-                  <div className="input-wrap">
-                    <span className="input-pill">{symbol}</span>
-                    <input
-                      type="number"
-                      name="amount"
-                      value={newIncome.amount}
-                      onChange={handleChange}
-                      step="0.01"
-                      placeholder="e.g., 150"
-                      className="form-control custom-input with-prefix"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="field-block">
-                  <label className="form-label">Payment Method</label>
-                  <select
-                    name="paymentMethod"
-                    value={newIncome.paymentMethod}
-                    onChange={handleChange}
-                    className="form-control custom-input custom-select"
-                  >
-                    <option value="Cash">Cash</option>
-                    <option value="Credit Card">Credit Card</option>
-                    <option value="Debit Card">Debit Card</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Cheque">Cheque</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div className="field-block">
-                  <label className="form-label">Date</label>
-                  <input
-                    type="date"
-                    name="date"
-                    value={newIncome.date}
-                    onChange={handleChange}
-                    className="form-control custom-input"
-                    required
-                  />
-                </div>
-
-                <div className="field-block field-full">
-                  <label className="form-label">Description</label>
-                  <textarea
-                    name="description"
-                    value={newIncome.description}
-                    onChange={handleChange}
-                    rows="3"
-                    className="form-control custom-input custom-textarea"
-                    placeholder="Add a short description"
-                  />
-                </div>
-
-                <div className="field-block field-full other-income-submit-actions">
-                  <button
-                    type="submit"
-                    className="submit-btn other-income-submit-btn d-inline-flex align-items-center justify-content-center"
-                  >
-                    <FaCoins className="me-2 other-income-submit-icon" aria-hidden />
-                    Add Income
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-
-          <div className="glass-card shared-card-surface table-card">
-            <div className="section-header">
-              <h2 className="section-title">Recent Income Records</h2>
-              <p className="section-subtitle">
-                View and manage your latest income records.
-              </p>
-            </div>
-
-            <div className="table-wrap">
-              <table className="income-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Source</th>
-                    <th>Amount</th>
-                    <th>Payment Method</th>
-                    <th>Description</th>
-                    <th className="text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan="6" className="empty-row">
-                        Loading income records...
-                      </td>
-                    </tr>
-                  ) : incomes.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" className="empty-row">
-                        No income records found
-                      </td>
-                    </tr>
-                  ) : (
-                    incomes.map((income) => (
-                      <tr key={income._id}>
-                        <td>{new Date(income.date).toLocaleDateString()}</td>
-                        <td>{income.source}</td>
-                        <td>
-                          {symbol}
-                          {Number(income.amount).toFixed(2)}
-                        </td>
-                        <td>{income.paymentMethod || "Cash"}</td>
-                        <td>{income.description || "-"}</td>
-                        <td className="text-center action-cell">
-                          <button
-                            className="table-btn edit-btn"
-                            onClick={() => openEditModal(income)}
-                            type="button"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="table-btn delete-btn"
-                            onClick={() => handleDelete(income._id)}
-                            type="button"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <div className="revenue-container animate-fade-in">
+      <ToastContainer theme="dark" />
+      
+      <div className="d-flex justify-content-between align-items-end mb-5 flex-wrap gap-4">
+        <div>
+          <h1 className="premium-title mb-1">Miscellaneous Revenue</h1>
+          <p className="premium-subtitle mb-0">Record non-sales income like tips, event fees, and donations</p>
         </div>
       </div>
 
-      {editingIncome && (
-        <div className="modal-overlay">
-          <div className="modal-box shared-card-surface">
-            <div className="modal-header">
-              <h5 className="modal-title">Edit Income</h5>
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setEditingIncome(null)}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="modal-body">
-              <form onSubmit={handleUpdate}>
-                <div className="modal-form-grid">
-                  <div className="field-block">
-                    <label className="form-label">Income Source</label>
-                    <select
-                      name="source"
-                      value={editData.source}
-                      onChange={handleEditChange}
-                      className="form-control custom-input custom-select"
-                    >
-                      <option>Tips</option>
-                      <option>Event Rental</option>
-                      <option>Merchandise</option>
-                      <option>Delivery Fee</option>
-                      <option>Donations</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-
-                  <div className="field-block">
-                    <label className="form-label">Amount ({symbol})</label>
-                    <div className="input-wrap">
-                      <span className="input-pill">{symbol}</span>
-                      <input
-                        type="number"
-                        name="amount"
-                        value={editData.amount}
-                        onChange={handleEditChange}
-                        step="0.01"
-                        className="form-control custom-input with-prefix"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="field-block">
-                    <label className="form-label">Payment Method</label>
-                    <select
-                      name="paymentMethod"
-                      value={editData.paymentMethod}
-                      onChange={handleEditChange}
-                      className="form-control custom-input custom-select"
-                    >
-                      <option value="Cash">Cash</option>
-                      <option value="Credit Card">Credit Card</option>
-                      <option value="Debit Card">Debit Card</option>
-                      <option value="Bank Transfer">Bank Transfer</option>
-                      <option value="Cheque">Cheque</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="field-block">
-                    <label className="form-label">Date</label>
-                    <input
-                      type="date"
-                      name="date"
-                      value={editData.date.split("T")[0]}
-                      onChange={handleEditChange}
-                      className="form-control custom-input"
-                      required
-                    />
-                  </div>
-
-                  <div className="field-block field-full">
-                    <label className="form-label">Description</label>
-                    <textarea
-                      name="description"
-                      value={editData.description}
-                      onChange={handleEditChange}
-                      rows="3"
-                      className="form-control custom-input custom-textarea"
-                    />
-                  </div>
-
-                  <div className="modal-actions">
-                    <button type="submit" className="submit-btn flex-btn">
-                      Save Changes
-                    </button>
-                    <button
-                      type="button"
-                      className="danger-btn flex-btn"
-                      onClick={() => handleDelete(editingIncome)}
-                    >
-                      Delete
-                    </button>
-                  </div>
+      <div className="row g-5">
+        <div className="col-xl-4">
+            <div className="premium-card p-4">
+                <div className="d-flex align-items-center gap-3 mb-4">
+                    <div className="bg-gold-glow p-3 rounded-circle"><FaDonate className="text-gold" size={24} /></div>
+                    <h3 className="premium-title h5 mb-0">{editingId ? "Update Entry" : "New Income Log"}</h3>
                 </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+                
+                <form onSubmit={handleSubmit} className="d-flex flex-column gap-4">
+                    <div>
+                        <label className="orient-stat-label">Revenue Source</label>
+                        <select className="premium-input premium-select" value={formData.source} onChange={(e) => setFormData({...formData, source: e.target.value})}>
+                            <option value="Tips">Service Tips</option>
+                            <option value="Event Rental">Event Space Rental</option>
+                            <option value="Merchandise">Branded Merchandise</option>
+                            <option value="Delivery Fee">Surcharge / Delivery</option>
+                            <option value="Donations">Grant / Donations</option>
+                            <option value="Other">Other Miscellaneous</option>
+                        </select>
+                    </div>
 
-      <ToastContainer position="top-right" autoClose={2500} />
+                    <div className="row g-3">
+                        <div className="col-md-6">
+                            <label className="orient-stat-label">Amount ({symbol})</label>
+                            <div className="position-relative">
+                                <FaCoins className="position-absolute top-50 start-0 translate-middle-y ms-3 text-gold" />
+                                <input type="number" step="0.01" className="premium-input ps-5" placeholder="0.00" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} />
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <label className="orient-stat-label">Transaction Date</label>
+                            <input type="date" className="premium-input" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="orient-stat-label">Payment Mode</label>
+                        <div className="d-flex gap-2">
+                            {['Cash', 'Card', 'Bank'].map(mode => (
+                                <button key={mode} type="button" className={`btn-premium flex-grow-1 py-2 small ${formData.paymentMethod === mode ? 'btn-premium-secondary' : 'btn-premium-primary'}`} onClick={() => setFormData({...formData, paymentMethod: mode})}>
+                                    {mode === 'Cash' && <FaMoneyBillWave className="me-1" />}
+                                    {mode === 'Card' && <FaCreditCard className="me-1" />}
+                                    {mode}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="orient-stat-label">Remarks / Description</label>
+                        <textarea className="premium-input" rows="3" placeholder="Brief note..." value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+                    </div>
+
+                    <button type="submit" className="btn-premium btn-premium-secondary py-3" disabled={loading}>
+                        {editingId ? <><FaSave className="me-2" /> Commit Changes</> : <><FaPlus className="me-2" /> Log Revenue</>}
+                    </button>
+                    {editingId && <button type="button" className="btn-premium btn-premium-primary py-2" onClick={() => {setEditingId(null); setFormData({source: "Tips", amount: "", description: "", date: new Date().toISOString().split("T")[0], paymentMethod: "Cash"})}}>Cancel Edit</button>}
+                </form>
+            </div>
+        </div>
+
+        <div className="col-xl-8">
+            <div className="orient-card p-0 overflow-hidden">
+                <div className="p-4 border-bottom border-white-05 d-flex justify-content-between align-items-center">
+                    <h5 className="text-white mb-0"><FaHistory className="me-2 text-gold" /> Recent Non-Sales Inflow</h5>
+                </div>
+                <div className="premium-table-container">
+                    <table className="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Source / Desc</th>
+                                <th>Method</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th className="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr><td colSpan="5" className="text-center py-5"><div className="spinner-border text-gold"></div></td></tr>
+                            ) : incomes.length === 0 ? (
+                                <tr><td colSpan="5" className="text-center py-5 text-muted">No miscellaneous revenue recorded.</td></tr>
+                            ) : incomes.slice(0, 12).map(inc => (
+                                <tr key={inc._id}>
+                                    <td>
+                                        <div className="text-white fw-bold">{inc.source}</div>
+                                        <div className="small orient-text-muted">{inc.description || 'No description'}</div>
+                                    </td>
+                                    <td><div className={`badge-premium ${inc.paymentMethod === 'Cash' ? 'badge-success' : 'badge-primary'}`}>{inc.paymentMethod}</div></td>
+                                    <td><div className="small text-white">{new Date(inc.date).toLocaleDateString()}</div></td>
+                                    <td><div className="text-gold fw-bold">{symbol}{inc.amount?.toFixed(2)}</div></td>
+                                    <td className="text-center">
+                                        <div className="d-flex justify-content-center gap-2">
+                                            <button className="btn-premium btn-premium-accent p-2" onClick={() => { setEditingId(inc._id); setFormData(inc); }}><FaEdit /></button>
+                                            <button className="btn-premium btn-premium-primary p-2" onClick={() => handleDelete(inc._id)}><FaTrash /></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+      </div>
 
       <style>{`
-        .other-income-page {
-          min-height: 100vh;
-          position: relative;
-          overflow-x: hidden;
-          overflow-y: auto;
-          background: linear-gradient(160deg, #f6faf9 0%, #f1f5ff 42%, #eef8f6 100%);
-          padding: 28px 24px 34px;
-        }
-
-        .other-income-page .page-grid {
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
-          background-size: 44px 44px;
-          pointer-events: none;
-          mask-image: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.12));
-        }
-
-        .other-income-page .page-glow {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(95px);
-          opacity: 0.35;
-          pointer-events: none;
-        }
-
-        .other-income-page .glow-1 {
-          width: 300px;
-          height: 300px;
-          top: -80px;
-          left: -60px;
-          background: hsla(160, 42%, 42%, 0.2);
-        }
-
-        .other-income-page .glow-2 {
-          width: 340px;
-          height: 340px;
-          right: -80px;
-          bottom: -80px;
-          background: rgba(59, 130, 246, 0.16);
-        }
-
-        .other-income-page .page-shell {
-          width: calc(100% - 80px);
-          max-width: none;
-          margin: 0 auto;
-          position: relative;
-          z-index: 1;
-        }
-
-        .other-income-page .shared-card-surface {
-          border-radius: 30px;
-          border: 1px solid rgba(15, 23, 42, 0.08) !important;
-          background: #ffffff !important;
-          backdrop-filter: none !important;
-          -webkit-backdrop-filter: none !important;
-          box-shadow:
-            0 18px 50px rgba(15, 23, 42, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
-        }
-
-        .other-income-page .hero-card {
-          padding: 24px 30px;
-  margin: 0 auto 24px auto;
-  max-width: 1500px;
-  width: 100%;
-  align-items: center;
-}
-
-        .other-income-page .hero-badge {
-          display: inline-flex;
-          padding: 8px 14px;
-          border-radius: 999px;
-          font-size: 12px;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: #166534;
-          background: hsla(160, 40%, 42%, 0.14);
-          border: 1px solid hsla(160, 42%, 40%, 0.22);
-        }
-
-        .other-income-page .hero-title {
-          margin: 14px 0 8px;
-          color: #0f172a;
-          font-size: clamp(30px, 3vw, 44px);
-          font-weight: 800;
-          letter-spacing: -0.03em;
-          line-height: 1.05;
-        }
-
-        .other-income-page .hero-subtitle {
-          margin: 0;
-          color: rgba(15, 23, 42, 0.62);
-          font-size: 15px;
-          line-height: 1.7;
-          max-width: 760px;
-        }
-
-        .other-income-page .stack-layout {
-          display: flex;
-          flex-direction: column;
-          gap: 24px;
-          width: 100%;
-        }
-
-        .other-income-page .glass-card {
-          padding: 24px 30px;
-  margin: 0 auto 24px auto;
-  max-width: 1500px;
-  width: 100%;
-  align-items: center;
-}
-
-        .other-income-page .form-card,
-        .other-income-page .table-card {
-          padding: 24px 30px;
-  margin: 0 auto 24px auto;
-  max-width: 1500px;
-  width: 100%;
-  align-items: center;
-}
-
-        .other-income-page .section-header {
-          margin-bottom: 22px;
-        }
-
-        .other-income-page .section-title {
-          margin: 0 0 8px;
-          color: #0f172a;
-          font-size: 30px;
-          font-weight: 800;
-          letter-spacing: -0.02em;
-          line-height: 1.1;
-        }
-
-        .other-income-page .section-subtitle {
-          margin: 0;
-          color: rgba(15, 23, 42, 0.6);
-          font-size: 14px;
-          line-height: 1.7;
-        }
-
-        .other-income-page .form-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 18px;
-        }
-
-        .other-income-page .modal-form-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 18px;
-        }
-
-        .other-income-page .field-full {
-          grid-column: 1 / -1;
-        }
-
-        .other-income-page .field-block {
-          min-width: 0;
-        }
-
-        .other-income-page .form-label {
-          display: block;
-          margin-bottom: 10px;
-          color: #0f172a;
-          font-size: 15px;
-          font-weight: 700;
-        }
-
-        .other-income-page .input-wrap {
-          position: relative;
-        }
-
-        .other-income-page .input-pill {
-          position: absolute;
-          left: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 34px;
-          height: 34px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 800;
-          color: #ffffff;
-          background: linear-gradient(135deg, #22c55e, #16a34a);
-          z-index: 2;
-          box-shadow: 0 12px 20px rgba(34, 197, 94, 0.24);
-        }
-
-        .other-income-page .with-prefix {
-          padding-left: 58px !important;
-        }
-
-        .other-income-page .custom-input {
-          width: 100%;
-          height: 60px;
-          border-radius: 18px;
-          border: 1px solid rgba(15, 23, 42, 0.12);
-          background: #ffffff;
-          color: #0f172a;
-          color-scheme: light;
-          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
-          font-size: 15px;
-          padding: 0 16px;
-          transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-        }
-
-        .other-income-page .custom-input:focus {
-          background: #ffffff;
-          color: #0f172a;
-          border-color: hsla(160, 42%, 40%, 0.55);
-          box-shadow: 0 0 0 4px hsla(160, 40%, 42%, 0.14) !important;
-        }
-
-        .other-income-page .custom-input::placeholder {
-          color: rgba(15, 23, 42, 0.42);
-        }
-
-        .other-income-page .custom-select {
-          appearance: none;
-          cursor: pointer;
-        }
-
-        .other-income-page .custom-textarea {
-          height: auto;
-          min-height: 120px;
-          padding-top: 14px;
-          resize: none;
-        }
-
-        .other-income-page .submit-btn,
-        .other-income-page .danger-btn,
-        .other-income-page .table-btn {
-          border: none;
-          border-radius: 16px;
-          font-size: 14px;
-          font-weight: 800;
-          color: #ffffff;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .other-income-page .submit-btn {
-          height: 60px;
-          background: linear-gradient(135deg, #22c55e, #16a34a);
-          box-shadow: 0 16px 32px rgba(34, 197, 94, 0.22);
-        }
-
-        .other-income-page .other-income-submit-actions {
-          display: flex;
-          justify-content: center;
-          padding-top: 6px;
-        }
-
-        .other-income-page .submit-btn.other-income-submit-btn {
-          width: auto !important;
-          min-width: min(100%, 280px);
-          min-height: 58px;
-          height: auto;
-          padding: 16px 120px;
-          font-size: 1.05rem;
-          letter-spacing: 0.03em;
-          border-radius: 18px;
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.22),
-            0 3px 0 rgba(5, 46, 22, 0.14),
-            0 14px 32px rgba(22, 163, 74, 0.32);
-        }
-
-        .other-income-page .other-income-submit-icon {
-          font-size: 1.15rem;
-        }
-
-        .other-income-page .other-income-submit-btn:hover:not(:disabled) {
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.28),
-            0 4px 0 rgba(5, 46, 22, 0.12),
-            0 18px 42px rgba(22, 163, 74, 0.38);
-        }
-
-        .other-income-page .submit-btn:hover,
-        .other-income-page .danger-btn:hover,
-        .other-income-page .table-btn:hover {
-          transform: translateY(-2px);
-        }
-
-        .other-income-page .table-wrap {
-          overflow-x: auto;
-          border-radius: 22px;
-          border: 1px solid rgba(15, 23, 42, 0.08);
-          background: #ffffff;
-          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
-        }
-
-        .other-income-page .income-table {
-          width: 100%;
-          min-width: 950px;
-          border-collapse: collapse;
-        }
-
-        .other-income-page .income-table thead tr {
-          background: #f1f5f9;
-        }
-
-        .other-income-page .income-table th {
-          padding: 18px 20px;
-          text-align: left;
-          color: #475569;
-          font-size: 13px;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-          border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-        }
-
-        .other-income-page .income-table td {
-          padding: 18px 20px;
-          color: #334155;
-          font-size: 14px;
-          border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-          vertical-align: middle;
-          background: #ffffff;
-        }
-
-        .other-income-page .income-table tbody tr:hover td {
-          background: #f8fafc;
-        }
-
-        .other-income-page .text-center {
-          text-align: center;
-        }
-
-        .other-income-page .action-cell {
-          white-space: nowrap;
-        }
-
-        .other-income-page .table-btn {
-          padding: 10px 14px;
-          margin: 0 4px;
-        }
-
-        .other-income-page .edit-btn {
-          background: linear-gradient(135deg, #22c55e, #16a34a);
-          box-shadow: 0 10px 22px rgba(34, 197, 94, 0.22);
-        }
-
-        .other-income-page .delete-btn,
-        .other-income-page .danger-btn {
-          background: linear-gradient(135deg, #ef4444, #dc2626);
-          box-shadow: 0 10px 22px rgba(239, 68, 68, 0.22);
-        }
-
-        .other-income-page .empty-row {
-          text-align: center;
-          color: #94a3b8 !important;
-          padding: 34px !important;
-          background: #ffffff !important;
-        }
-
-        .other-income-page .modal-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(15, 23, 42, 0.45);
-          backdrop-filter: blur(4px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1050;
-          padding: 16px;
-        }
-
-        .other-income-page .modal-box {
-          width: 100%;
-          max-width: 720px;
-          overflow: hidden;
-        }
-
-        .other-income-page .modal-header {
-          padding: 20px 24px;
-          border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .other-income-page .modal-title {
-          margin: 0;
-          color: #0f172a;
-          font-size: 22px;
-          font-weight: 800;
-        }
-
-        .other-income-page .modal-close {
-          width: 40px;
-          height: 40px;
-          border: none;
-          border-radius: 12px;
-          background: #f1f5f9;
-          color: #334155;
-          font-size: 24px;
-          line-height: 1;
-        }
-
-        .other-income-page .modal-body {
-          padding: 24px;
-        }
-
-        .other-income-page .modal-actions {
-          grid-column: 1 / -1;
-          display: flex;
-          gap: 12px;
-        }
-
-        .other-income-page .flex-btn {
-          flex: 1;
-          height: 56px;
-        }
-
-        @media (max-width: 768px) {
-          .other-income-page .page-shell {
-            width: calc(100% - 24px);
-          }
-
-          .other-income-page {
-            padding: 18px 12px;
-          }
-
-          .other-income-page .hero-card,
-          .other-income-page .glass-card,
-          .other-income-page .modal-body {
-            padding: 20px;
-          }
-
-          .other-income-page .form-grid,
-          .other-income-page .modal-form-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .other-income-page .field-full,
-          .other-income-page .modal-actions {
-            grid-column: auto;
-          }
-
-          .other-income-page .modal-actions {
-            flex-direction: column;
-          }
-
-          .other-income-page .section-title {
-            font-size: 24px;
-          }
-        }
+        .bg-gold-glow { background: rgba(255, 183, 3, 0.1); }
+        .border-white-05 { border-color: rgba(255,255,255,0.05) !important; }
       `}</style>
     </div>
   );

@@ -2,7 +2,7 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { FaEnvelope, FaLock, FaArrowRight } from "react-icons/fa";
+import { FaUserShield, FaKey, FaChevronRight } from "react-icons/fa";
 import { AuthContext } from "../context/auth-context";
 import "./Login.css";
 
@@ -39,19 +39,19 @@ const AdminLogin = () => {
       <div className="login-bg-overlay"></div>
 
       <div className="login-glass-card">
-        <h2 className="login-card-title">Admin Terminal</h2>
-        <span className="login-card-subtitle"></span>
+        <h2 className="login-card-title">Administrator</h2>
+        <span className="login-card-subtitle">Secure System Access Terminal</span>
 
         <form onSubmit={handleLogin}>
           <div className="login-input-group">
-            <label htmlFor="email">System Identity (Email)</label>
+            <label htmlFor="email">System Identity</label>
             <div className="login-input-wrapper">
-              <FaEnvelope className="login-input-icon" />
+              <FaUserShield className="login-input-icon" />
               <input
                 type="email"
                 className="login-input-premium"
                 id="email"
-                placeholder="Enter your email"
+                placeholder="Enter admin email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -61,14 +61,14 @@ const AdminLogin = () => {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="password">Encrypted Access (Password)</label>
+            <label htmlFor="password">Access Key</label>
             <div className="login-input-wrapper">
-              <FaLock className="login-input-icon" />
+              <FaKey className="login-input-icon" />
               <input
                 type="password"
                 className="login-input-premium"
                 id="password"
-                placeholder="Enter your password"
+                placeholder="Enter access key"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -85,19 +85,21 @@ const AdminLogin = () => {
             {loading ? (
               <>
                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Logging in...
+                Verifying Credentials...
               </>
             ) : (
               <>
-                Administrative Login <FaArrowRight />
+                Authorize Access <FaChevronRight />
               </>
             )}
           </button>
         </form>
 
         <div className="login-footer">
-          <p>Restricted access area. Unauthorized entry is logged.</p>
-          <p style={{ marginTop: "10px" }}><Link to="/" className="link-gold">Exit to Public View</Link></p>
+          <p>This is a restricted administrative interface.</p>
+          <p style={{ marginTop: "15px" }}>
+            <Link to="/" className="link-gold">Back to Homepage</Link>
+          </p>
         </div>
       </div>
     </div>
