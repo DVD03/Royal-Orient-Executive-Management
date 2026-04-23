@@ -7,12 +7,10 @@ import {
   FaMoneyCheckAlt, FaUtensils, FaDollarSign, FaShoppingCart, FaHistory,
   FaBookOpen, FaClipboardList, FaUserCircle, FaPercentage, FaTruckLoading,
   FaFirstOrder, FaMotorcycle, FaUserClock, FaCashRegister, FaBookReader, FaCoins, FaWallet, FaPrint, FaUserTag, FaDatabase,
-  FaChevronDown, FaTimes
+  FaChevronDown, FaTimes, FaIndent, FaOutdent
 } from "react-icons/fa";
 import "../styles/OrientPremium.css";
 import NotificationCenter from "./NotificationCenter";
-import useRefreshStatus from "../hooks/useRefreshStatus";
-import { FaRedo } from "react-icons/fa";
 
 const RoleLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -27,6 +25,7 @@ const RoleLayout = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
       if (mobile) setSidebarOpen(false);
+      else setSidebarOpen(true);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -47,7 +46,12 @@ const RoleLayout = () => {
     const isActive = location.pathname === to;
     return (
       <li className="orient-menu-item" key={to}>
-        <Link to={to} className={`orient-link ${isActive ? "active" : ""}`} onClick={() => isMobile && setSidebarOpen(false)}>
+        <Link 
+          to={to} 
+          className={`orient-link ${isActive ? "active" : ""}`} 
+          onClick={() => isMobile && setSidebarOpen(false)}
+          title={!sidebarOpen ? label : ""}
+        >
           <Icon className="orient-icon" />
           {sidebarOpen && <span className="orient-label">{label}</span>}
         </Link>
@@ -123,7 +127,7 @@ const RoleLayout = () => {
       <aside className={`orient-sidebar ${!sidebarOpen ? "collapsed" : ""} ${isMobile && sidebarOpen ? "mobile-open" : ""}`}>
         <div className="orient-sidebar-header">
           <img src="/logo.jpg" alt="Logo" className="orient-logo" />
-          {sidebarOpen && <h1 className="orient-title">Demo RMS</h1>}
+          {sidebarOpen && <h1 className="orient-title">Royal Orient</h1>}
           {isMobile && sidebarOpen && (
             <button className="orient-close-btn" onClick={() => setSidebarOpen(false)}>
               <FaTimes />
@@ -137,7 +141,7 @@ const RoleLayout = () => {
         <div className="orient-sidebar-footer">
           <button className="orient-logout-link" onClick={logout}>
             <FaSignOutAlt className="orient-icon" />
-            {sidebarOpen && <span>Secure Logout</span>}
+            {sidebarOpen && <span>Logout</span>}
           </button>
         </div>
       </aside>
@@ -147,10 +151,10 @@ const RoleLayout = () => {
         <header className="orient-navbar">
           <div className="orient-nav-left">
             <button className="orient-toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-              <FaBars />
+              {sidebarOpen ? <FaIndent /> : <FaOutdent />}
             </button>
             <div className="orient-breadcrumb d-none d-md-block">
-               Terminal <span className="orient-text-gold">{user?.role}</span>
+               System Portal / <span className="orient-text-gold">{user?.role}</span>
             </div>
           </div>
 
@@ -159,14 +163,14 @@ const RoleLayout = () => {
             <div className="orient-user-profile" ref={dropdownRef}>
               <button className="orient-user-btn" onClick={() => setUserDropdown(!userDropdown)}>
                 <FaUserCircle className="orient-icon" />
-                <span className="d-none d-sm-inline">{user?.role}</span>
+                <span className="d-none d-sm-inline">{user?.name || user?.role}</span>
                 <FaChevronDown className={`chevron ${userDropdown ? "rotate" : ""}`} />
               </button>
               {userDropdown && (
                 <div className="orient-user-dropdown animate-fade-in">
                   <div className="dropdown-header">
-                    <strong>System User</strong>
-                    <span>{user?.role}</span>
+                    <strong>{user?.name || "System User"}</strong>
+                    <span>{user?.email}</span>
                   </div>
                   <button className="dropdown-item text-danger" onClick={logout}>
                     <FaSignOutAlt /> Logout
@@ -184,69 +188,96 @@ const RoleLayout = () => {
 
       <style>{`
         .orient-menu-divider {
-            padding: 20px 18px 10px;
-            font-size: 0.7rem;
+            padding: 15px 18px 5px;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             color: var(--orient-gold);
-            opacity: 0.6;
+            opacity: 0.5;
             font-weight: 700;
             display: ${sidebarOpen ? 'block' : 'none'};
         }
-        .orient-sidebar.collapsed .orient-label { display: none; }
-        .orient-sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .orient-sidebar-footer { padding: 10px; border-top: 1px solid var(--orient-border); }
         .orient-logout-link {
             width: 100%;
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 14px 18px;
+            gap: 12px;
+            padding: 10px 14px;
             background: transparent;
             border: none;
-            color: #ff4d4d;
+            color: #ef4444;
             cursor: pointer;
-            border-radius: 14px;
-            transition: all 0.3s;
+            border-radius: 8px;
+            transition: all 0.2s;
             font-weight: 600;
+            font-size: 0.85rem;
         }
-        .orient-logout-link:hover { background: rgba(255,77,77,0.1); }
+        .orient-logout-link:hover { background: rgba(239, 68, 68, 0.1); }
         .orient-toggle-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--orient-border);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .orient-toggle-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--orient-gold); }
+        .orient-text-gold { color: var(--orient-gold); font-weight: 700; text-transform: uppercase; }
+        .orient-user-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--orient-border);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .orient-user-btn:hover { background: rgba(255,255,255,0.06); }
+        .orient-user-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0px;
+            background: var(--orient-navy);
+            border: 1px solid var(--orient-border);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 200px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+        .dropdown-header { padding: 10px; border-bottom: 1px solid var(--orient-border); margin-bottom: 5px; }
+        .dropdown-header strong { display: block; font-size: 0.9rem; color: #fff; }
+        .dropdown-header span { font-size: 0.75rem; color: var(--orient-text-muted); }
+        .dropdown-item {
+            width: 100%;
+            padding: 10px;
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 1.2rem;
+            text-align: left;
+            border-radius: 6px;
             cursor: pointer;
-        }
-        .orient-text-gold { color: var(--orient-gold); font-weight: 700; text-transform: uppercase; margin-left: 5px; }
-        .orient-user-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 30px;
             display: flex;
             align-items: center;
             gap: 10px;
-            cursor: pointer;
+            font-size: 0.85rem;
         }
-        .orient-user-dropdown {
-            position: absolute;
-            top: 70px;
-            right: 40px;
-            background: #023047;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 10px;
-            min-width: 180px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .dropdown-header { padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
-        .dropdown-header span { font-size: 0.75rem; color: var(--orient-text-muted); }
-        .orient-close-btn { background: transparent; border: none; color: #fff; font-size: 1.5rem; }
-        @media (max-width: 1024px) {
-            .orient-sidebar { position: fixed; height: 100vh; left: -280px; }
-            .orient-sidebar.mobile-open { left: 0; }
-        }
+        .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+        .orient-close-btn { background: transparent; border: none; color: #fff; font-size: 1.2rem; }
+        
+        .orient-sidebar.collapsed .orient-menu-item { justify-content: center; }
+        .orient-sidebar.collapsed .orient-link { justify-content: center; padding: 12px; }
       `}</style>
     </div>
   );

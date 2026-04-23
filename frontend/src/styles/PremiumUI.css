@@ -1,202 +1,212 @@
-/* src/styles/PremiumUI.css */
+:root {
+  --orient-navy: #023047;
+  --orient-navy-dark: #011c2a;
+  --orient-gold: #ffb703;
+  --orient-gold-soft: rgba(255, 183, 3, 0.8);
+  --orient-red: #d90429;
+  --orient-red-dark: #b90424;
+  --orient-white: #ffffff;
+  --orient-text-main: #f8f9fa;
+  --orient-text-muted: rgba(248, 249, 250, 0.6);
+  --orient-glass: rgba(2, 48, 71, 0.7);
+  --orient-glass-light: rgba(255, 255, 255, 0.05);
+  --orient-border: rgba(255, 255, 255, 0.1);
+  --orient-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  
+  /* Reduced Font Sizes & Spacing for Compact Professionalism */
+  --font-size-base: 14px;
+  --spacing-compact: 16px;
+  --card-padding: 20px;
+}
 
-/* 1. Global Reset & Body */
+* {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
 body {
-    background-color: var(--neutral-dark);
-    color: var(--neutral-light);
-    font-family: var(--poppins);
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  background-color: var(--orient-navy-dark);
+  color: var(--orient-text-main);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
 }
 
-/* 2. Premium Glass Card */
-.premium-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px) saturate(180%);
-    -webkit-backdrop-filter: blur(15px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+/* --- Layout Containers --- */
+.premium-container {
+  padding: var(--spacing-compact);
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
-.premium-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+/* --- Professional Cards (Compact) --- */
+.premium-card, .orient-card {
+  background: var(--orient-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--orient-border);
+  border-radius: 12px;
+  padding: var(--card-padding);
+  box-shadow: var(--orient-shadow);
+  margin-bottom: var(--spacing-compact);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-/* 3. Premium Buttons */
-.btn-premium {
-    padding: 12px 24px;
-    border-radius: 12px;
-    border: none;
-    font-weight: 600;
-    font-family: var(--poppins);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    color: #fff;
+.orient-card:hover {
+  border-color: rgba(255, 183, 3, 0.3);
 }
 
-.btn-premium-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, #800000 100%);
-    box-shadow: 0 4px 15px rgba(217, 4, 41, 0.3);
-}
-
-.btn-premium-secondary {
-    background: linear-gradient(135deg, var(--secondary) 0%, #FB8500 100%);
-    color: #023047;
-    box-shadow: 0 4px 15px rgba(255, 183, 3, 0.3);
-}
-
-.btn-premium-accent {
-    background: linear-gradient(135deg, var(--accent) 0%, #0077B6 100%);
-    box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
-}
-
-.btn-premium:hover {
-    transform: translateY(-3px) scale(1.05);
-    filter: brightness(1.1);
-}
-
-.btn-premium:active {
-    transform: scale(0.95);
-}
-
-/* 4. Premium Table */
-.premium-table-container {
-    width: 100%;
-    overflow-x: auto;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.premium-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    color: #fff;
-}
-
-.premium-table th {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 18px 20px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.premium-table td {
-    padding: 16px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    font-size: 0.95rem;
-    vertical-align: middle;
-}
-
-.premium-table tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.premium-table tr:last-child td {
-    border-bottom: none;
-}
-
-/* 5. Premium Inputs */
-.premium-input {
-    width: 100%;
-    padding: 14px 18px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: #fff;
-    font-family: var(--poppins);
-    transition: all 0.3s ease;
-}
-
-.premium-input:focus {
-    outline: none;
-    border-color: var(--secondary);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 15px rgba(255, 183, 3, 0.2);
-}
-
-/* 6. Typography & Headings */
+/* --- Typography --- */
 .premium-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    background: linear-gradient(to right, #fff, var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 25px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--orient-white);
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
 }
 
 .premium-subtitle {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 30px;
+  font-size: 0.85rem;
+  color: var(--orient-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-/* 7. Status Badges */
+/* --- Flat Professional Buttons (No Glow) --- */
+.btn-premium {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.btn-premium-primary {
+  background: transparent;
+  color: var(--orient-white);
+  border-color: var(--orient-border);
+}
+
+.btn-premium-primary:hover {
+  background: var(--orient-glass-light);
+  border-color: var(--orient-white);
+}
+
+.btn-premium-secondary {
+  background: var(--orient-gold);
+  color: var(--orient-navy);
+  border: none;
+}
+
+.btn-premium-secondary:hover {
+  background: var(--orient-gold-soft);
+  transform: translateY(-1px);
+}
+
+.btn-premium-accent {
+  background: var(--orient-red);
+  color: var(--orient-white);
+}
+
+.btn-premium-accent:hover {
+  background: var(--orient-red-dark);
+}
+
+/* Remove all box-shadow glows */
+.btn-premium:focus {
+  box-shadow: none !important;
+}
+
+/* --- Professional Compact Tables --- */
+.premium-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+}
+
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.premium-table th {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--orient-gold);
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--orient-border);
+}
+
+.premium-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--orient-border);
+  color: var(--orient-text-main);
+}
+
+.premium-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* --- Compact Inputs --- */
+.premium-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--orient-border);
+  border-radius: 8px;
+  color: var(--orient-white);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.premium-input:focus {
+  outline: none;
+  border-color: var(--orient-gold);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Badges (Compact) --- */
 .badge-premium {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
-.badge-success { background: rgba(0, 255, 127, 0.15); color: #00FF7F; border: 1px solid rgba(0, 255, 127, 0.2); }
-.badge-warning { background: rgba(255, 183, 3, 0.15); color: #FFB703; border: 1px solid rgba(255, 183, 3, 0.2); }
-.badge-danger { background: rgba(217, 4, 41, 0.15); color: #D90429; border: 1px solid rgba(217, 4, 41, 0.2); }
+.badge-success { background: rgba(0, 255, 127, 0.1); color: #00FF7F; border: 1px solid rgba(0, 255, 127, 0.2); }
+.badge-danger { background: rgba(217, 4, 41, 0.1); color: #D90429; border: 1px solid rgba(217, 4, 41, 0.2); }
+.badge-primary { background: rgba(0, 180, 216, 0.1); color: #00B4D8; border: 1px solid rgba(0, 180, 216, 0.2); }
 
-/* 8. Premium Modals */
-.premium-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  .premium-title { font-size: 1.5rem; }
+  .premium-container { padding: 10px; }
+  .premium-card, .orient-card { padding: 15px; }
+  
+  /* Tables on mobile */
+  .premium-table { font-size: 0.8rem; }
+  .premium-table th, .premium-table td { padding: 8px 10px; }
+  
+  /* Form Grids */
+  .row.g-4 { --bs-gutter-x: 10px; --bs-gutter-y: 10px; }
 }
 
-.premium-modal {
-    background: #023047;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 28px;
-    padding: 35px;
-    width: 90%;
-    max-width: 600px;
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
-}
-
-/* 9. Premium Select */
-.premium-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 18px center;
-}
-
-/* 10. Animations */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+/* --- Utilities --- */
+.orient-text-muted { color: var(--orient-text-muted) !important; }
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
