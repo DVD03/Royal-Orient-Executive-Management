@@ -67,7 +67,7 @@ const AdminLogin = () => {
               />
             </div>
 
-            <button type="submit" className="auth-btn-primary mt-3" disabled={loading} style={{ background: '#b45309' }}>
+            <button type="submit" className="auth-btn-primary auth-btn-gold mt-3" disabled={loading}>
               {loading ? "AUTHORIZING..." : "AUTHORIZE ACCESS"}
             </button>
           </form>
@@ -79,9 +79,13 @@ const AdminLogin = () => {
       </div>
 
       <div className="auth-split-right">
-          <div className="text-center animate-in">
-              <div className="display-4 fw-900 text-white opacity-40">SECURE</div>
-              <div className="h6 text-white tracking-widest mt-2">ENCRYPTED PORTAL</div>
+          <div className="position-relative z-10 text-center animate-in">
+              <div className="branding-wrapper">
+                  <h1 className="luxury-text-royal">ROYAL</h1>
+                  <div className="luxury-divider"></div>
+                  <h2 className="luxury-text-orient">ADMIN</h2>
+                  <p className="luxury-est">SECURE ACCESS TERMINAL</p>
+              </div>
           </div>
       </div>
     </div>

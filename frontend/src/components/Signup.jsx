@@ -104,7 +104,10 @@ const Signup = () => {
               </div>
             )}
 
-            <button type="submit" className="auth-btn-primary mt-3">
+            <button 
+              type="submit" 
+              className={`auth-btn-primary mt-3 ${role === 'admin' ? 'auth-btn-gold' : role === 'kitchen' ? 'auth-btn-slate' : ''}`}
+            >
               AUTHORIZE ACCOUNT CREATION
             </button>
           </form>
@@ -117,9 +120,13 @@ const Signup = () => {
       </div>
 
       <div className="auth-split-right">
-          <div className="text-center animate-in">
-              <div className="display-4 fw-900 text-white opacity-20">ENROLL</div>
-              <div className="h6 text-white tracking-widest mt-2">PERSONNEL ONBOARDING</div>
+          <div className="position-relative z-10 text-center animate-in">
+              <div className="branding-wrapper">
+                  <h1 className="luxury-text-royal">ROYAL</h1>
+                  <div className="luxury-divider"></div>
+                  <h2 className="luxury-text-orient">REGISTRY</h2>
+                  <p className="luxury-est">PERSONNEL ONBOARDING PORTAL</p>
+              </div>
           </div>
       </div>
     </div>

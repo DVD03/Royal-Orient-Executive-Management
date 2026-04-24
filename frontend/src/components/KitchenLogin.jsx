@@ -70,7 +70,7 @@ const KitchenLogin = () => {
               />
             </div>
 
-            <button type="submit" className="auth-btn-primary mt-3" disabled={loading} style={{ background: '#334155' }}>
+            <button type="submit" className="auth-btn-primary auth-btn-slate mt-3" disabled={loading}>
               {loading ? "VERIFYING..." : "ENTER KITCHEN"}
             </button>
           </form>
@@ -82,9 +82,13 @@ const KitchenLogin = () => {
       </div>
 
       <div className="auth-split-right">
-          <div className="text-center animate-in">
-              <div className="display-4 fw-900 text-white opacity-40">KITCHEN</div>
-              <div className="h6 text-white tracking-widest mt-2">OPERATIONAL ACCESS</div>
+          <div className="position-relative z-10 text-center animate-in">
+              <div className="branding-wrapper">
+                  <h1 className="luxury-text-royal">ROYAL</h1>
+                  <div className="luxury-divider"></div>
+                  <h2 className="luxury-text-orient">KITCHEN</h2>
+                  <p className="luxury-est">OPERATIONAL ACCESS CONTROL</p>
+              </div>
           </div>
       </div>
     </div>

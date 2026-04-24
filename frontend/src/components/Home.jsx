@@ -22,11 +22,11 @@ const Home = () => {
                <FaCashRegister /> CASHIER TERMINAL
             </Link>
 
-            <Link to="/kitchen-login" className="auth-btn-primary" style={{ background: '#334155' }}>
+            <Link to="/kitchen-login" className="auth-btn-primary auth-btn-slate">
                <FaFire /> KITCHEN OPERATIONS
             </Link>
 
-            <Link to="/admin-login" className="auth-btn-primary" style={{ background: '#b45309' }}>
+            <Link to="/admin-login" className="auth-btn-primary auth-btn-gold">
                <FaShieldAlt /> ADMINISTRATION
             </Link>
           </div>
